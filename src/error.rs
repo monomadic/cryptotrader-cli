@@ -13,15 +13,10 @@ impl Display for CliError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             CliError::InvalidCommand => write!(f, "Invalid command."),
-            // _ => write!(f, ""),
         }
     }
 }
 
 impl Error for CliError {
     fn description(&self) -> &str { "error" }
-
-    // fn source(&self) -> Option<&(dyn Error + 'static)> {
-    //     Some(&self.side)
-    // }
 }

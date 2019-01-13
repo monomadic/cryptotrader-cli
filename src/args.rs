@@ -8,8 +8,12 @@ pub fn parse() -> CliResult<&'static str> {
         .setting(AppSettings::SubcommandRequiredElseHelp)
         .get_matches();
 
+    if matches.is_present("verbose") {
+        let _ = simple_logger::init_with_level(log::Level::Info);
+        info!("verbose logging enabled.");
+    }
+
     match matches.subcommand() {
-        // ("positions", Some(m)) => run_analyse(m, &logger),
         ("positions", Some(m)) => parse_positions(m),
         _ => { Err(Box::new(CliError::InvalidCommand)) },
     }

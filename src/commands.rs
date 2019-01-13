@@ -1,5 +1,5 @@
-type BoxResult<T> = Result<T,Box<std::error::Error>>;
+use crate::error::*;
 
-pub fn positions(pairs: Vec<&str>) -> BoxResult<&'static str> {
+pub fn positions(_pairs: Vec<&str>) -> CliResult<&'static str> {
     Ok("positions")
 }

@@ -4,6 +4,7 @@ author: Rob Saunders <rob@wearebrandnew.com>
 about: Command line interface to the CryptoTrader library.
 args:
     - verbose:
+        long: verbose
         short: v
         multiple: true
         help: Sets the level of verbosity
