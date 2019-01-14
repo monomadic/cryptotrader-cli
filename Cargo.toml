@@ -8,3 +8,4 @@ edition = "2018"
 clap = {version = "2.32", features = ["yaml"]}
 log = "0.4.5"
 simple_logger = "1.0.1"
+cryptotrader = { path = "../cryptotrader-core" }

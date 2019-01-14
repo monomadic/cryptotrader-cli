@@ -5,6 +5,8 @@ extern crate clap;
 extern crate log;
 extern crate simple_logger;
 
+extern crate cryptotrader;
+
 use std::process;
 
 mod args;

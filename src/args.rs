@@ -13,6 +13,9 @@ pub fn parse() -> CliResult<&'static str> {
         info!("verbose logging enabled.");
     }
 
+    // args have successfully parsed so we can start loading config etc.
+    let conf = cryptotrader::config::read(false)?;
+
     match matches.subcommand() {
         ("positions", Some(m)) => parse_positions(m),
         _ => { Err(Box::new(CliError::InvalidCommand)) },
