@@ -1,11 +1,9 @@
 use crate::error::*;
-use crate::utils::*;
-use crate::display;
 
 use cryptotrader;
 use cryptotrader::exchanges::ExchangeAPI;
 use cryptotrader::models::*;
-use cryptotrader::presenters::*;
+use cryptotrader::presenters::*; 
 
 pub fn positions<E>(client: E) -> CliResult<String> where E:ExchangeAPI {
 	use crate::display::DisplayTicker;
