@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use core::fmt::Display;
 use std::fmt;
 use std::error::Error;

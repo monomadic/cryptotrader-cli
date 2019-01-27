@@ -1,4 +1,6 @@
 use clap::{App, ArgMatches, AppSettings};
+#![allow(dead_code)]
+#![allow(unused_variables)]
 
 use crate::error::*;
 
