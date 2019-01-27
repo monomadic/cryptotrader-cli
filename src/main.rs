@@ -13,6 +13,7 @@ mod args;
 mod commands;
 mod error;
 mod utils;
+mod display;
 
 fn main() {
     match args::parse() {

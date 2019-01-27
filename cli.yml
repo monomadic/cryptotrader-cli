@@ -16,3 +16,6 @@ subcommands:
             - debug:
                 short: d
                 help: print debug information
+            - ticker:
+                short: t
+                help: ticker display
