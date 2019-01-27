@@ -12,6 +12,7 @@ use std::process;
 mod args;
 mod commands;
 mod error;
+mod utils;
 
 fn main() {
     match args::parse() {
