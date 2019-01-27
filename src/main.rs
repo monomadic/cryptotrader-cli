@@ -1,19 +1,10 @@
-#[macro_use]
-extern crate clap;
-
-#[macro_use]
-extern crate log;
-extern crate simple_logger;
-
-extern crate cryptotrader;
-
-use std::process;
-
 mod args;
 mod commands;
 mod error;
 mod utils;
 mod display;
+
+use std::process;
 
 fn main() {
     match args::parse() {

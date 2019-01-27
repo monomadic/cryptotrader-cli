@@ -3,6 +3,8 @@
 
 // use cryptotrader::config::APIConfig;
 use clap;
+use clap::load_yaml;
+use log::info;
 
 use crate::error::*;
 
