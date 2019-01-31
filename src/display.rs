@@ -7,12 +7,20 @@ pub trait DisplayTicker {
 
 impl DisplayTicker for PositionPresenter {
     fn display_ticker(&self) -> String {
-        format!("{} {:.2} btc {} {}",
+        format!("{} {}{:.2} btc {} {}",
             self.symbol().yellow(),
+            print_bool(self.is_valid()),
             self.current_value_in_btc(),
             positive_negative(self.percent_change(), format!("{:.2}%", self.percent_change())),
             positive_negative(self.unrealised_profit_usd(), format!("(${:.2})", self.unrealised_profit_usd())),
         )
+    }
+}
+
+fn print_bool(condition: bool) -> String {
+    match condition {
+        true    => "".to_string(),
+        false   => "*".red().to_string(),
     }
 }
 
