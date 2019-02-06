@@ -1,9 +1,14 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
 
-// use cryptotrader::config::APIConfig;
+// todo: rename to parse
+
+use cryptotrader::{
+    exchanges::binance::BinanceAPI,
+    exchanges::ExchangeAPI,
+};
 use clap;
-use clap::load_yaml;
+use clap::{ load_yaml, AppSettings, ArgMatches };
 use log::info;
 
 use crate::error::*;
@@ -11,7 +16,7 @@ use crate::error::*;
 pub fn parse() -> CliResult<String> {
     let yaml = load_yaml!("../cli.yml");
     let matches = clap::App::from_yaml(yaml)
-        // .setting(AppSettings::SubcommandRequiredElseHelp)
+        .setting(AppSettings::SubcommandRequiredElseHelp)
         .get_matches();
 
     if matches.is_present("verbose") {
@@ -22,16 +27,21 @@ pub fn parse() -> CliResult<String> {
     // args have successfully parsed so we can start loading config etc.
     let conf = cryptotrader::config::read()?;
     let keys = &conf.exchange["binance"];
-    let client = cryptotrader::exchanges::binance::connect(&keys.api_key, &keys.secret_key);
+    let client = BinanceAPI::connect(&keys.api_key, &keys.secret_key);
 
-    super::commands::positions(client)
+    // super::commands::positions(client)
 
-    // match matches.subcommand() {
-    //     ("positions", Some(m)) => parse_positions(m, conf.exchange["binance"].clone()),
-    //     _ => { Err(Box::new(CliError::InvalidCommand)) },
-    // }
+    match matches.subcommand() {
+        ("positions", Some(m)) => parse_positions(m, client),
+        ("pairs", Some(m)) => parse_pairs(m, client),
+        _ => { Err(Box::new(CliError::InvalidCommand)) },
+    }
 }
 
-// fn parse_positions(_matches: &ArgMatches, _conf: APIConfig) -> CliResult<String> {
-//     super::commands::positions()
-// }
+fn parse_positions<E>(_matches: &ArgMatches, client: E) -> CliResult<String> where E:ExchangeAPI {
+    crate::commands::positions(client)
+}
+
+fn parse_pairs<E>(_matches: &ArgMatches, client: E) -> CliResult<String> where E:ExchangeAPI {
+    crate::commands::pairs(client)
+}

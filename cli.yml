@@ -9,13 +9,12 @@ args:
         multiple: true
         help: Sets the level of verbosity
 subcommands:
+    - pairs:
+        about: Displays all pairs on the exchange.
     - positions:
         about: Evaluates open positions
         short: p
         args:
-            - debug:
-                short: d
-                help: print debug information
             - ticker:
                 short: t
                 help: ticker display

@@ -1,47 +1,53 @@
 use crate::error::*;
 
+// todo: rename to process or fetch
+
 use cryptotrader;
-use cryptotrader::exchanges::ExchangeAPI;
-use cryptotrader::models::*;
-use cryptotrader::presenters::*; 
+use cryptotrader::{
+	exchanges::ExchangeAPI,
+	models::*,
+	presenters::*,
+};
+
+mod pairs; pub use self::pairs::*;
 
 pub fn positions<E>(client: E) -> CliResult<String> where E:ExchangeAPI {
 	use crate::display::DisplayTicker;
 
-	// let pairs = vec!["NULSBTC".to_string(), "WAVESBTC".to_string()];
 	let funds = client.funds()?;
-	let prices = client.prices()?;
+	let prices = client.all_pairs()?;
+	let btcusd_pair = client.btc_price()?;
 
-	let btc_price_in_usd = *(prices.get("BTCUSDT").unwrap_or(&0.0));
-	let funds_presenter = FundsPresenter::new(funds.clone(), prices.clone(), btc_price_in_usd.clone());
+	let total_value_in_btc = 50.0;
 	let pairs:Vec<String> = funds.alts.clone().into_iter().map(|fund| format!("{}BTC", fund.symbol)).collect();
 	let mut result_buffer = Vec::new();
 
 	for pair in pairs.clone() {
 		if let Ok(orders) = client.trades_for(&pair) {
-			let current_price = *(prices.get(&pair).unwrap_or(&0.0));
-			let grouped_orders = cryptotrader::models::group_by_price(orders.clone());
-			let positions = Position::new(grouped_orders); // fix this to give one order, take multiple positions
+			if let Some(current_pair) = prices.clone().into_iter().find(|p| p.symbol == pair && p.base == "BTC") {
+				let grouped_orders = cryptotrader::models::group_by_price(orders.clone());
+				let positions = Position::new(grouped_orders); // fix this to give one order, take multiple positions
 
-			if let Some(position) = positions.last() {
-				let assets:Vec<Asset> = funds.alts.clone().into_iter()
-					.filter(|asset| position.symbol().contains(&asset.symbol))
-					.collect();
+				if let Some(position) = positions.last() {
+					let assets:Vec<Asset> = funds.alts.clone().into_iter()
+						.filter(|asset| position.symbol().contains(&asset.symbol))
+						.collect();
 
-				let wallet_qty = assets.last()
-					.expect(&format!("no qty found for: {}", position.symbol()))
-					.amount;
+					let wallet_qty = assets.last()
+						.expect(&format!("no qty found for: {}", position.symbol()))
+						.amount;
 
-				let position = position.clone();
+					let position = position.clone();
 
-				result_buffer.push(
-					PositionPresenter{
-						position,
-						current_price,
-						btc_price_in_usd,
-						wallet_qty,
-					}.display_ticker()
-				);
+					result_buffer.push(
+						PositionPresenter{
+							position,
+							current_price: current_pair.price,
+							btc_price_in_usd: btcusd_pair.price,
+							wallet_qty,
+						}.display_ticker()
+					);
+				}
 			}
 		}
 	}
@@ -51,13 +57,10 @@ pub fn positions<E>(client: E) -> CliResult<String> where E:ExchangeAPI {
 	use colored::*;
 	result.push_str(&format!("\n{} {:.4} btc :: {} ${:.0}",
 		"FUNDS".cyan(),
-		funds_presenter.total_value_in_btc,
+		total_value_in_btc,
 		"BTC PRICE".cyan(),
-		btc_price_in_usd,
+		btcusd_pair.price,
 	));
 	
 	Ok(result)
-
-    // Ok(iter_map(pairs, {|pair| format!("[{}]", pair)})
-    // 	.join(" "))
 }
