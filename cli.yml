@@ -18,3 +18,9 @@ subcommands:
             - ticker:
                 short: t
                 help: ticker display
+            - format:
+                long: format
+                help: Displays the data in different layouts
+                # possible_values can also be defined in this list format
+                possible_values: [ table, ticker ]
+                takes_value: true

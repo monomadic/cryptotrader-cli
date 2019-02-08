@@ -12,6 +12,7 @@ use clap::{ load_yaml, AppSettings, ArgMatches };
 use log::info;
 
 use crate::error::*;
+use crate::display;
 
 pub fn parse() -> CliResult<String> {
     let yaml = load_yaml!("../cli.yml");
@@ -36,8 +37,16 @@ pub fn parse() -> CliResult<String> {
     }
 }
 
-fn parse_positions<E>(_matches: &ArgMatches, client: E) -> CliResult<String> where E:ExchangeAPI {
-    crate::commands::positions::fetch(client)
+fn parse_positions<E>(matches: &ArgMatches, client: E) -> CliResult<String> where E:ExchangeAPI {
+    let positions = crate::commands::positions::fetch(client)?;
+
+    Ok(if let Some(format) = matches.value_of("format") {
+        match format {
+            "table" => display::positions::table(positions),
+            "ticker" => display::positions::ticker(positions),
+            _ => display::positions::ticker(positions),
+        }
+    } else { display::positions::ticker(positions) })
 }
 
 fn parse_pairs<E>(_matches: &ArgMatches, client: E) -> CliResult<String> where E:ExchangeAPI {

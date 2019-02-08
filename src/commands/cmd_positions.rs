@@ -7,16 +7,18 @@ use log::info;
 
 use crate::display;
 
-pub fn fetch<E>(client: E) -> CliResult<String> where E:ExchangeAPI {
+pub enum PositionDisplayFormat  {
+    Table,
+    Ticker,
+}
 
+pub fn fetch<E>(client: E) -> CliResult<Vec<PositionPresenter>> where E:ExchangeAPI {
     info!("client: balances()");
 	let assets = client.balances()?;
     info!("response: found assets: {}", assets.clone().into_iter().map(|p| p.symbol).collect::<Vec<String>>().join(", "));
 
     info!("client: all_pairs()");
 	let pairs = client.all_pairs()?;
-	// let btcusd_pair = client.btc_price()?;
-	// let total_value_in_btc = 50.0;
     info!("response: found {} pairs.", pairs.len());
 
 	let mut result_buffer = Vec::new();
@@ -30,12 +32,10 @@ pub fn fetch<E>(client: E) -> CliResult<String> where E:ExchangeAPI {
 
 			if let Some(position) = positions.last() {
 				let symbol_pairs = map_pairs_by_symbol(&asset.symbol, pairs.clone());
-				let output = display::positions::ticker(PositionPresenter::new(position.clone(), symbol_pairs));
-				result_buffer.push(output);
+				result_buffer.push(PositionPresenter::new(position.clone(), symbol_pairs));
 			}
 		}
 	}
-    let result = result_buffer.join(" :: ");
 
-    Ok(result)
+    Ok(result_buffer)
 }
