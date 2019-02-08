@@ -1,14 +1,51 @@
 use cryptotrader;
-use cryptotrader::{ models::* };
+use cryptotrader::models::*;
 
 use colored::*;
 
 type PairMap = HashMap<String, Vec<Pair>>;
 use std::collections::HashMap;
 
-pub fn table(pairs: PairMap) -> String {
-    pairs.into_iter().map(|(symbol, pairs)| {
-        let pairs = pairs.into_iter().map(|p| format!("{} {}", p.base, p.price)).collect::<Vec<String>>().join(" : ");
-        format!("{:.10} - {}\n", symbol.yellow(), pairs)
-    }).collect::<Vec<String>>().join("")
+pub fn table(pairs: PairMap, base_pairs: Vec<String>) -> String {
+    let mut output_buffer = format!("{:16}", "");
+
+    output_buffer.push_str(
+        &base_pairs
+            .clone()
+            .into_iter()
+            .map(|symbol| format!("{:16}", symbol.yellow()))
+            .collect::<Vec<String>>()
+            .join(""),
+    );
+
+    output_buffer.push_str("\n");
+
+    output_buffer.push_str(
+        &pairs
+            .into_iter()
+            .map(|(symbol, pairs)| {
+                format!(
+                    "{:16}{}",
+                    symbol.yellow(),
+                    base_pairs
+                        .clone()
+                        .into_iter()
+                        .map(|base_pair| {
+                            if let Some(pair) =
+                                pairs.clone().into_iter().find(|p| p.base == base_pair)
+                            {
+                                format!("{:<16}", pair.price)
+                            } else {
+                                format!("{:<16}", "-")
+                            }
+                        })
+                        .collect::<Vec<String>>()
+                        .join("")
+                )
+            })
+            .collect::<Vec<String>>()
+            .join("\n"),
+    );
+
+    output_buffer
 }
