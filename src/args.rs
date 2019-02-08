@@ -29,8 +29,6 @@ pub fn parse() -> CliResult<String> {
     let keys = &conf.exchange["binance"];
     let client = BinanceAPI::connect(&keys.api_key, &keys.secret_key);
 
-    // super::commands::positions(client)
-
     match matches.subcommand() {
         ("positions", Some(m)) => parse_positions(m, client),
         ("pairs", Some(m)) => parse_pairs(m, client),
@@ -39,9 +37,9 @@ pub fn parse() -> CliResult<String> {
 }
 
 fn parse_positions<E>(_matches: &ArgMatches, client: E) -> CliResult<String> where E:ExchangeAPI {
-    crate::commands::positions(client)
+    crate::commands::positions::fetch(client)
 }
 
 fn parse_pairs<E>(_matches: &ArgMatches, client: E) -> CliResult<String> where E:ExchangeAPI {
-    crate::commands::pairs(client)
+    crate::commands::pairs::fetch(client)
 }

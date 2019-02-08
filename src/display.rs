@@ -1,21 +1,8 @@
 use colored::*;
-use cryptotrader::presenters::*;
 
-pub trait DisplayTicker {
-    fn display_ticker(&self) -> String;
-}
-
-impl DisplayTicker for PositionPresenter {
-    fn display_ticker(&self) -> String {
-        format!("{} {}{:.2} btc {} {}",
-            self.symbol().yellow(),
-            print_bool(self.is_valid()),
-            self.current_value_in_btc(),
-            positive_negative(self.percent_change(), format!("{:.2}%", self.percent_change())),
-            positive_negative(self.unrealised_profit_usd(), format!("(${:.2})", self.unrealised_profit_usd())),
-        )
-    }
-}
+pub mod display_pairs; pub use self::display_pairs as pairs;
+pub mod display_positions; pub use self::display_positions as positions;
+pub mod display_assets; pub use self::display_assets as assets;
 
 fn print_bool(condition: bool) -> String {
     match condition {
@@ -27,11 +14,9 @@ fn print_bool(condition: bool) -> String {
 fn positive_negative(number: f64, string: String) -> String {
     if number > 0.01 {
         string.green().to_string()
+    } else if number < 0.01 {
+        string.red().to_string()
     } else {
-        if number < 0.01 {
-            string.red().to_string()
-        } else {
-            string
-        }
+        string
     }
 }
