@@ -37,7 +37,7 @@ fn table_row(trade: Trade) -> String {
         entry_price = display::pairs::pretty_price_from_base(&trade.pair.base, trade.price),
         cost = display::pairs::pretty_price_from_base(&trade.pair.base, trade.cost()),
         value = display_value_vs_cost(trade.clone()),
-        time = trade.time,
+        time = trade.time.format("%Y-%m-%d %H:%M:%S").to_string(),
     )
 }
 
