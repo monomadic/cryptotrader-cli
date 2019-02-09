@@ -24,3 +24,10 @@ subcommands:
                 # possible_values can also be defined in this list format
                 possible_values: [ table, ticker ]
                 takes_value: true
+    - trades:
+        about: Shows all trades for a specific symbol across all pairs
+        args:
+            - symbol:
+                takes_value: true
+                multiple: false
+                required: true

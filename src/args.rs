@@ -8,6 +8,7 @@ use clap::{load_yaml, AppSettings, ArgMatches};
 use cryptotrader::{exchanges::binance::BinanceAPI, exchanges::ExchangeAPI};
 use log::info;
 
+use crate::commands;
 use crate::display;
 use crate::error::*;
 
@@ -30,6 +31,7 @@ pub fn parse() -> CliResult<String> {
     match matches.subcommand() {
         ("positions", Some(m)) => parse_positions(m, client),
         ("pairs", Some(m)) => parse_pairs(m, client),
+        ("trades", Some(m)) => parse_trades(m, client),
         _ => Err(Box::new(CliError::InvalidCommand)),
     }
 }
@@ -56,4 +58,16 @@ where
     E: ExchangeAPI,
 {
     crate::commands::pairs::fetch(client, vec!["BTC", "BNB", "LINK", "BTT"])
+}
+
+fn parse_trades<E>(matches: &ArgMatches, client: E) -> CliResult<String>
+where
+    E: ExchangeAPI,
+{
+    if let Some(symbol) = matches.value_of("symbol") {
+        let trades = commands::trades::fetch(client, symbol)?;
+        Ok(display::trades::table(trades))
+    } else {
+        panic!("multiple commands required");
+    }
 }

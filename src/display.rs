@@ -1,13 +1,20 @@
 use colored::*;
 
-pub mod display_pairs; pub use self::display_pairs as pairs;
-pub mod display_positions; pub use self::display_positions as positions;
-pub mod display_assets; pub use self::display_assets as assets;
+pub mod display_pairs;
+pub use self::display_pairs as pairs;
+pub mod display_positions;
+pub use self::display_positions as positions;
+pub mod display_assets;
+pub use self::display_assets as assets;
+pub mod display_trades;
+pub use self::display_trades as trades;
+pub mod display_trade_type;
+pub use self::display_trade_type as trade_type;
 
 fn print_bool(condition: bool) -> String {
     match condition {
-        true    => "".to_string(),
-        false   => "*".red().to_string(),
+        true => "".to_string(),
+        false => "*".red().to_string(),
     }
 }
 

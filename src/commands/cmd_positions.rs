@@ -1,13 +1,7 @@
-use crate::display;
 use crate::error::*;
 use cryptotrader;
 use cryptotrader::{exchanges::*, models::*, presenters::*};
 use log::info;
-
-pub enum PositionDisplayFormat {
-    Table,
-    Ticker,
-}
 
 pub fn fetch<E>(client: E) -> CliResult<Vec<PositionPresenter>>
 where

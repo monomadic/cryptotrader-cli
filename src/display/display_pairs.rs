@@ -49,3 +49,19 @@ pub fn table(pairs: PairMap, base_pairs: Vec<String>) -> String {
 
     output_buffer
 }
+
+pub fn pretty_price(pair: &Pair) -> String {
+    match pair.base.as_ref() {
+        "BTC" => format!("{:.8}", pair.price),
+        "USDT" => format!("{:.3}", pair.price),
+        _ => format!("{}", pair.price),
+    }
+}
+
+pub fn pretty_cost(pair: &Pair, cost: f64) -> String {
+    match pair.base.as_ref() {
+        "BTC" => format!("{:.8} btc", cost),
+        "USDT" => format!("${:.0}", cost),
+        _ => format!("{:.3}", cost),
+    }
+}
