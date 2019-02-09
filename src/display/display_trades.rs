@@ -47,7 +47,7 @@ fn display_value_vs_cost(trade: Trade) -> String {
     if trade.pair.base_is_fiat() {
         format!("{value} ({profit_as_percent}, {profit})",
             value = print_fiat(trade.value()),
-            profit = print_fiat(trade.value()),
+            profit = print_fiat(profit),
             profit_as_percent = print_percent(value_vs_cost_as_percent(trade.cost(), profit)),
         )
     } else {
