@@ -20,9 +20,7 @@ where
     let trades: Vec<Vec<Trade>> = map_ok(
         pairs
             .into_iter()
-            .map(|pair| {
-                client._trades_for(&client.symbol_and_base_to_pair_format(&pair.symbol, &pair.base))
-            })
+            .map(|pair| client.trades_for_pair(pair))
             .collect(),
     );
 

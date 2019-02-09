@@ -1,7 +1,7 @@
 use cryptotrader;
 use cryptotrader::models::*;
-
-use colored::*;
+use super::*;
+// use colored::*;
 
 type PairMap = HashMap<String, Vec<Pair>>;
 use std::collections::HashMap;
@@ -50,18 +50,23 @@ pub fn table(pairs: PairMap, base_pairs: Vec<String>) -> String {
     output_buffer
 }
 
-pub fn pretty_price(pair: &Pair) -> String {
-    match pair.base.as_ref() {
-        "BTC" => format!("{:.8}", pair.price),
-        "USDT" => format!("{:.3}", pair.price),
-        _ => format!("{}", pair.price),
-    }
-}
+// pub fn pretty_price(pair: &Pair) -> String {
+//     // if is_tiny_number(pair.price) {
+//     //     format!("{:.8}", pair.price)
+//     // } else {
+//     //     format!("{:.3}", pair.price)
+//     // }
+//     match pair.base.as_ref() {
+//         "BTC" => format!("{:.8}", pair.price),
+//         "USDT" => format!("${:.3}", pair.price),
+//         _ => format!("{}", pair.price),
+//     }
+// }
 
-pub fn pretty_cost(pair: &Pair, cost: f64) -> String {
-    match pair.base.as_ref() {
-        "BTC" => format!("{:.8} btc", cost),
-        "USDT" => format!("${:.0}", cost),
+pub fn pretty_price_from_base(base: &str, cost: f64) -> String {
+    match base {
+        "BTC" => format!("{:.8}", cost),
+        "USDT" => format!("${:.2}", cost),
         _ => format!("{:.3}", cost),
     }
 }

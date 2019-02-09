@@ -21,7 +21,6 @@ subcommands:
             - format:
                 long: format
                 help: Displays the data in different layouts
-                # possible_values can also be defined in this list format
                 possible_values: [ table, ticker ]
                 takes_value: true
     - trades:
@@ -31,3 +30,7 @@ subcommands:
                 takes_value: true
                 multiple: false
                 required: true
+            - limit:
+                required: false
+                takes_value: true
+                multiple: false

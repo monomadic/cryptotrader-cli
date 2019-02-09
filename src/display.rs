@@ -27,3 +27,27 @@ fn positive_negative(number: f64, string: String) -> String {
         string
     }
 }
+
+// fn is_tiny_number(num: f64) -> bool {
+//     num < 1.0
+// }
+
+fn print_percent(num: f64) -> String {
+    format!("{:.2}%", num)
+}
+
+fn print_fiat(num: f64) -> String {
+    if num < 10.0 {
+        format!("${:.3}", num)
+    } else {
+        format!("${:.0}", num)
+    }
+}
+
+fn print_btc(num: f64) -> String {
+    if num < 1.0 {
+        format!("{:.8}", num)
+    } else {
+        format!("{:.4}", num)
+    }
+}
