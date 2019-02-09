@@ -4,7 +4,7 @@ use cryptotrader;
 use cryptotrader::{exchanges::*, models::*};
 use log::info;
 
-pub fn fetch<E>(client: E, symbol: &str) -> CliResult<Vec<Vec<Trade>>>
+pub fn fetch<E>(client: E, symbol: &str, limit: Option<usize>) -> CliResult<Vec<Vec<Trade>>>
 where
     E: ExchangeAPI,
 {
@@ -16,13 +16,18 @@ where
         string_map(pairs.clone(), { |p| p.base }).join(" ")
     );
 
-    // for pair in pairs {
-    let trades: Vec<Vec<Trade>> = map_ok(
-        pairs
-            .into_iter()
-            .map(|pair| client.trades_for_pair(pair))
-            .collect(),
-    );
+    let mut all_trades:Vec<Vec<Trade>> = Vec::new();
 
-    Ok(trades)
+    for pair in pairs {
+        let trades = client.trades_for_pair(pair)?;
+
+        // if limit is supplied, chop it!
+        let trades = if let Some(limit) = limit {
+            trades.into_iter().take(limit).collect()
+        } else { trades };
+
+        all_trades.push(trades);
+    }
+
+    Ok(all_trades)
 }

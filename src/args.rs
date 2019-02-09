@@ -64,8 +64,15 @@ fn parse_trades<E>(matches: &ArgMatches, client: E) -> CliResult<String>
 where
     E: ExchangeAPI,
 {
+    // this is so ugly fml
+    let limit:Option<usize> = if let Some(limit) = matches.value_of("limit") {
+        if let Ok(valid_limit) = limit.parse::<usize>() {
+            Some(valid_limit)
+        } else { None }
+    } else { None };
+
     if let Some(symbol) = matches.value_of("symbol") {
-        let trades = commands::trades::fetch(client, symbol)?;
+        let trades = commands::trades::fetch(client, symbol, limit)?;
         Ok(display::trades::table(trades))
     } else {
         panic!("multiple commands required");

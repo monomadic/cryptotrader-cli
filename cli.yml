@@ -31,6 +31,8 @@ subcommands:
                 multiple: false
                 required: true
             - limit:
+                short: l
+                long: limit
                 required: false
                 takes_value: true
                 multiple: false
