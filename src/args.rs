@@ -6,7 +6,7 @@
 use clap;
 use clap::{load_yaml, AppSettings, ArgMatches};
 use cryptotrader::{exchanges::binance::BinanceAPI, exchanges::ExchangeAPI};
-use log::info;
+// use log::info;
 
 use crate::commands;
 use crate::display;
@@ -18,10 +18,7 @@ pub fn parse() -> CliResult<String> {
         .setting(AppSettings::SubcommandRequiredElseHelp)
         .get_matches();
 
-    if matches.is_present("verbose") {
-        let _ = simple_logger::init_with_level(log::Level::Info);
-        info!("verbose logging enabled.");
-    }
+    parse_verbose(&matches);
 
     // args have successfully parsed so we can start loading config etc.
     let conf = cryptotrader::config::read()?;
@@ -33,6 +30,12 @@ pub fn parse() -> CliResult<String> {
         ("pairs", Some(m)) => parse_pairs(m, client),
         ("trades", Some(m)) => parse_trades(m, client),
         _ => Err(Box::new(CliError::InvalidCommand)),
+    }
+}
+
+fn parse_verbose(matches: &ArgMatches) {
+    if matches.is_present("verbose") {
+        let _ = simple_logger::init_with_level(log::Level::Info);
     }
 }
 
@@ -64,12 +67,7 @@ fn parse_trades<E>(matches: &ArgMatches, client: E) -> CliResult<String>
 where
     E: ExchangeAPI,
 {
-    // this is so ugly fml
-    let limit:Option<usize> = if let Some(limit) = matches.value_of("limit") {
-        if let Ok(valid_limit) = limit.parse::<usize>() {
-            Some(valid_limit)
-        } else { None }
-    } else { None };
+    let limit = parse_limit(matches.value_of("limit"));
 
     if let Some(symbol) = matches.value_of("symbol") {
         let trades = commands::trades::fetch(client, symbol, limit)?;
@@ -77,4 +75,8 @@ where
     } else {
         panic!("multiple commands required");
     }
+}
+
+fn parse_limit(limit: Option<&str>) -> Option<usize> {
+    limit.map(|l| l.parse::<usize>().ok()).unwrap_or(None)
 }
