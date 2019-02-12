@@ -72,7 +72,9 @@ where
     let limit = parse_limit(matches.value_of("limit"));
 
     if let Some(symbol) = matches.value_of("symbol") {
-        let trades = commands::trades::fetch(client, symbol, limit)?;
+        // let group = matches.value_of("group");
+        let trades =
+            commands::trades::fetch(client, symbol, limit, matches.value_of("group").is_some())?;
         Ok(display::trades::table(trades))
     } else {
         panic!("symbol required");
