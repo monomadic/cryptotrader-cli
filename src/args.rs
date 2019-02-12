@@ -29,7 +29,9 @@ pub fn parse() -> CliResult<String> {
         ("positions", Some(m)) => parse_positions(m, client),
         ("pairs", Some(m)) => parse_pairs(m, client),
         ("trades", Some(m)) => parse_trades(m, client),
-        _ => Err(Box::new(CliError::InvalidCommand)),
+        _ => Err(Box::new(CliError::ArgumentError(
+            "Invalid Argument".to_string(),
+        ))),
     }
 }
 
@@ -73,7 +75,7 @@ where
         let trades = commands::trades::fetch(client, symbol, limit)?;
         Ok(display::trades::table(trades))
     } else {
-        panic!("multiple commands required");
+        panic!("symbol required");
     }
 }
 
