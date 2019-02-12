@@ -28,7 +28,14 @@ where
 
 pub fn optional_limit<T>(limit: Option<usize>, vector: Vec<T>) -> Vec<T> {
     if let Some(limit) = limit {
-        vector.into_iter().take(limit).collect()
+        vector
+            .into_iter()
+            .rev()
+            .take(limit)
+            .collect::<Vec<T>>()
+            .into_iter()
+            .rev()
+            .collect()
     } else {
         vector
     }

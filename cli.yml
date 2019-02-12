@@ -36,3 +36,9 @@ subcommands:
                 required: false
                 takes_value: true
                 multiple: false
+            - group:
+                short: g
+                long: group
+                required: false
+                takes_value: false
+                multiple: false

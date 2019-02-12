@@ -16,16 +16,11 @@ where
         string_map(pairs.clone(), { |p| p.base }).join(" ")
     );
 
-    let mut all_trades:Vec<Vec<Trade>> = Vec::new();
+    let mut all_trades: Vec<Vec<Trade>> = Vec::new();
 
     for pair in pairs {
         let trades = client.trades_for_pair(pair)?;
-
-        // if limit is supplied, chop it!
-        let trades = if let Some(limit) = limit {
-            trades.into_iter().take(limit).collect()
-        } else { trades };
-
+        let trades = optional_limit(limit, trades);
         all_trades.push(trades);
     }
 
