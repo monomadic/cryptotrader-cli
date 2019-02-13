@@ -11,6 +11,10 @@ pub use self::display_trades as trades;
 pub mod display_trade_type;
 pub use self::display_trade_type as trade_type;
 
+static SMALL_COLUMN_WIDTH: usize = 8;
+static NORMAL_COLUMN_WIDTH: usize = 16;
+// static WIDE_COLUMN_WIDTH: usize = 32;
+
 fn print_bool(condition: bool) -> String {
     match condition {
         true => "".to_string(),
@@ -18,19 +22,15 @@ fn print_bool(condition: bool) -> String {
     }
 }
 
-fn positive_negative(number: f64, string: String) -> String {
+fn positive_negative(number: f64, string: String) -> ColoredString {
     if number > 0.01 {
-        string.green().to_string()
+        string.green()
     } else if number < 0.01 {
-        string.red().to_string()
+        string.red()
     } else {
-        string
+        string.normal()
     }
 }
-
-// fn is_tiny_number(num: f64) -> bool {
-//     num < 1.0
-// }
 
 fn print_percent(num: f64) -> String {
     format!("{:.2}%", num)

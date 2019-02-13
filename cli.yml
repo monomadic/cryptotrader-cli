@@ -42,3 +42,9 @@ subcommands:
                 required: false
                 takes_value: false
                 multiple: false
+            - average:
+                short: a
+                long: average
+                required: false
+                takes_value: false
+                multiple: false

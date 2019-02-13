@@ -9,20 +9,23 @@ pub fn table(trade_groups: Vec<Vec<Trade>>) -> String {
         .into_iter()
         .map(|trades| {
             format!(
-                "{:12}{:9}{:16}{:16}{:16}{:16}{:32}{:16}\n{}",
+                "{:normal_width$}{:small_width$}{:normal_width$}{:normal_width$}{:normal_width$}{:normal_width$}{:normal_width$}{:normal_width$}{:normal_width$}\n{}",
                 "PAIR",
                 "TYPE",
-                "PRICE",
+                "ENTRY_PRICE",
+                "CURRENT_PRICE",
+                "SIZE",
                 "QTY",
-                "COST",
                 "FEE",
-                "VALUE",
+                "PROFIT/LOSS",
                 "TIME",
                 &trades
                     .into_iter()
                     .map(|trade| table_row(trade))
                     .collect::<Vec<String>>()
-                    .join("\n")
+                    .join("\n"),
+                small_width = SMALL_COLUMN_WIDTH,
+                normal_width = NORMAL_COLUMN_WIDTH,
             )
         })
         .collect::<Vec<String>>()
@@ -31,30 +34,43 @@ pub fn table(trade_groups: Vec<Vec<Trade>>) -> String {
 
 fn table_row(trade: Trade) -> String {
     format!(
-        "{symbol:12}{trade_type:<9}{entry_price:<16}{qty:<16}{cost:<16}{fee:16}{value:<32}{time:<16}",
+        "{symbol:normal_width$}
+        {trade_type:<small_width$}
+        {entry_price:normal_width$}
+        {current_price:<normal_width$}
+        {size:<normal_width$}
+        {qty: <normal_width$}
+        {fee:normal_width$}
+        {profit:normal_width$}
+        {time:<normal_width$}",
         symbol = format!("{}-{}", trade.pair.symbol, trade.pair.base).yellow(),
-        qty = trade.qty,
         trade_type = display::trade_type::colored(trade.trade_type),
         entry_price = display::pairs::pretty_price_from_base(&trade.pair.base, trade.price),
-        cost = display::pairs::pretty_price_from_base(&trade.pair.base, trade.cost()),
-        fee = format!("{} {}", &trade.fee, &trade.clone().fee_symbol.unwrap_or("".to_string())),
-        value = display_value_vs_cost(trade.clone()),
-        time = trade.time.format("%Y-%m-%d %H:%M:%S").to_string(),
+        size = format!("{:.3}", trade.value()),
+        qty = trade.qty,
+        current_price = display::pairs::pretty_price_from_base(&trade.pair.base, trade.pair.price),
+        fee = format!(
+            "{:.3} {}",
+            &trade.fee,
+            &trade.clone().fee_symbol.unwrap_or("".to_string())
+        ),
+        profit = positive_negative(trade.profit(), display_profit(trade.clone())),
+        time = trade.time.format("%Y-%m-%d %H:%M").to_string(),
+        small_width = SMALL_COLUMN_WIDTH,
+        normal_width = NORMAL_COLUMN_WIDTH,
     )
 }
 
-fn display_value_vs_cost(trade: Trade) -> String {
+fn display_profit(trade: Trade) -> String {
     if trade.pair.base_is_fiat() {
         format!(
-            "{value} ({profit_as_percent}, {profit})",
-            value = print_fiat(trade.value()),
+            "{profit:.2} ({profit_as_percent})",
             profit = print_fiat(trade.profit()),
             profit_as_percent = print_percent(trade.profit_as_percent()),
         )
     } else {
         format!(
-            "{value} ({profit_as_percent})",
-            value = print_btc(trade.value()),
+            "{profit_as_percent}",
             profit_as_percent = print_percent(trade.profit_as_percent()),
         )
     }

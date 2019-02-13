@@ -6,7 +6,7 @@
 use clap;
 use clap::{load_yaml, AppSettings, ArgMatches};
 use cryptotrader::{exchanges::binance::BinanceAPI, exchanges::ExchangeAPI};
-// use log::info;
+use log::info;
 
 use crate::commands;
 use crate::display;
@@ -73,8 +73,7 @@ where
 
     if let Some(symbol) = matches.value_of("symbol") {
         // let group = matches.value_of("group");
-        let trades =
-            commands::trades::fetch(client, symbol, limit, matches.value_of("group").is_some())?;
+        let trades = commands::trades::fetch(client, symbol, limit, matches.is_present("group"))?;
         Ok(display::trades::table(trades))
     } else {
         panic!("symbol required");

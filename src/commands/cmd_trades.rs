@@ -25,12 +25,11 @@ where
 
     for pair in pairs {
         let trades = client.trades_for_pair(pair)?;
-        let trades = optional_limit(limit, trades);
-
         let trades = match group {
-            true => average_trades(trades),
+            true => group_and_average_trades_by_trade_type(trades),
             false => trades,
         };
+        let trades = optional_limit(limit, trades);
 
         all_trades.push(trades);
     }
