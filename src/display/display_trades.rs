@@ -1,6 +1,6 @@
 use super::*;
 use crate::display;
-use colored::*;
+// use colored::*;
 use cryptotrader;
 use cryptotrader::models::*;
 
@@ -44,24 +44,18 @@ fn table_row(trade: Trade) -> String {
 }
 
 fn display_value_vs_cost(trade: Trade) -> String {
-    let profit = trade.value() - trade.cost();
-
     if trade.pair.base_is_fiat() {
         format!(
             "{value} ({profit_as_percent}, {profit})",
             value = print_fiat(trade.value()),
-            profit = print_fiat(profit),
-            profit_as_percent = print_percent(value_vs_cost_as_percent(trade.cost(), profit)),
+            profit = print_fiat(trade.profit()),
+            profit_as_percent = print_percent(trade.profit_as_percent()),
         )
     } else {
         format!(
             "{value} ({profit_as_percent})",
             value = print_btc(trade.value()),
-            profit_as_percent = print_percent(value_vs_cost_as_percent(trade.cost(), profit)),
+            profit_as_percent = print_percent(trade.profit_as_percent()),
         )
     }
-}
-
-fn value_vs_cost_as_percent(cost: f64, value: f64) -> f64 {
-    100.0 / cost * value
 }

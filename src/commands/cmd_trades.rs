@@ -35,5 +35,7 @@ where
         all_trades.push(trades);
     }
 
+    info!("trades: {:#?}", all_trades);
+
     Ok(all_trades)
 }

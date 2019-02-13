@@ -29,10 +29,9 @@ where
             find_pair_by_symbol_and_base(&asset.symbol, &client.btc_symbol(), pairs.clone())
         {
             let pair = &client.pair_format(btc_pair_for_asset);
-            info!("client: trades_for({})", pair);
-            let orders = client.trades_for(pair)?;
-            let grouped_orders = cryptotrader::models::group_by_price(orders.clone());
-            let positions = Position::new(grouped_orders); // fix this to give one order, take multiple positions
+            let trades = client.trades_for(pair)?;
+            let grouped_trades = cryptotrader::models::group_trades_by_price(trades.clone());
+            let positions = Position::new(grouped_trades, asset.amount); // fix this to give one order, take multiple positions
 
             if let Some(position) = positions.last() {
                 let symbol_pairs = find_all_pairs_by_symbol(&asset.symbol, pairs.clone());
@@ -40,6 +39,8 @@ where
             }
         }
     }
+
+    info!("position presenters: {:#?}", result_buffer);
 
     Ok(result_buffer)
 }
