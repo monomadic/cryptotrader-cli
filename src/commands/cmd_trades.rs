@@ -9,11 +9,16 @@ pub fn fetch<E>(
     symbol: &str,
     limit: Option<usize>,
     group: bool,
-) -> CliResult<Vec<Vec<Trade>>>
+) -> CliResult<(Vec<Vec<Trade>>, Pair)>
 where
     E: ExchangeAPI,
 {
     let pairs = client.all_pairs()?;
+
+    let btc_pair = client
+        .btc_pair(pairs.clone())
+        .expect(&format!("{:#?} BTC pair to be found.", pairs.clone()));
+
     let pairs = find_all_pairs_by_symbol(&symbol, pairs.clone());
 
     info!(
@@ -23,7 +28,7 @@ where
 
     let mut all_trades: Vec<Vec<Trade>> = Vec::new();
 
-    for pair in pairs {
+    for pair in pairs.clone() {
         let trades = client.trades_for_pair(pair)?;
         let trades = match group {
             true => group_and_average_trades_by_trade_type(trades),
@@ -36,5 +41,5 @@ where
 
     info!("trades: {:#?}", all_trades);
 
-    Ok(all_trades)
+    Ok((all_trades, btc_pair))
 }

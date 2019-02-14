@@ -19,19 +19,15 @@ where
             .join(", ")
     );
 
-    info!("client: all_pairs()");
     let pairs = client.all_pairs()?;
-    info!("response: found {} pairs.", pairs.len());
 
     let mut result_buffer = Vec::new();
     for asset in assets {
         if let Some(btc_pair_for_asset) =
             find_pair_by_symbol_and_base(&asset.symbol, &client.btc_symbol(), pairs.clone())
         {
-            let pair = &client.pair_format(btc_pair_for_asset);
-            let trades = client.trades_for(pair)?;
-            let grouped_trades = cryptotrader::models::group_trades_by_price(trades.clone());
-            let positions = Position::new(grouped_trades, asset.amount); // fix this to give one order, take multiple positions
+            let trades = client.trades_for_pair(btc_pair_for_asset)?;
+            let positions = Position::new(trades, asset.amount);
 
             if let Some(position) = positions.last() {
                 let symbol_pairs = find_all_pairs_by_symbol(&asset.symbol, pairs.clone());
@@ -41,6 +37,5 @@ where
     }
 
     info!("position presenters: {:#?}", result_buffer);
-
     Ok(result_buffer)
 }
