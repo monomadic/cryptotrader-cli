@@ -45,7 +45,7 @@ pub fn table(presenters: Vec<Vec<TradePresenter>>) -> String {
                 .collect::<Vec<String>>()
                 .join("\n")})
         .collect::<Vec<String>>()
-        .join("");
+        .join("\n");
 
     format!(
         "{:normal_width$}{:small_width$}{:normal_width$}{:normal_width$}{:normal_width$}{:normal_width$}{:normal_width$}{:wide_width$}{:normal_width$}\n{}",

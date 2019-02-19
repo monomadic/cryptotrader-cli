@@ -42,8 +42,8 @@ pub fn table(presenters: Vec<PositionPresenter>) -> String {
                 entry_price                 = position.entry_price(),
                 exit_price                  = position.exit_price().map_or("".to_string(), |m| format!("{:.8}", m)),
             )
-        }
-    ).collect::<Vec<String>>().join("\n"))
+        }).collect::<Vec<String>>().join("\n")
+    )
 }
 
 fn size(presenter: PositionPresenter) -> String {
