@@ -8,10 +8,7 @@ pub fn fetch<E>(client: E, symbols: Vec<&str>) -> CliResult<String>
 where
     E: ExchangeAPI,
 {
-    info!("client: all_pairs()");
     let pairs = client.all_pairs()?;
-    info!("response: found {} pairs", pairs.len());
-
     let pairs = sort_pairs(pairs);
 
     // filter symbols

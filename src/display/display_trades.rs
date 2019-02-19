@@ -113,22 +113,6 @@ fn display_profit(trade_presenter: TradePresenter) -> String {
     }
 }
 
-// fn display_profit(trade: Trade, btc_pair: Pair) -> String {
-//     if trade.pair.base_is_fiat() {
-//         format!(
-//             "{profit:.2} ({profit_as_percent})",
-//             profit = print_fiat(trade.profit()),
-//             profit_as_percent = print_percent(trade.profit_as_percent()),
-//         )
-//     } else {
-//         format!(
-//             "{profit_as_percent} ({:.2})",
-//             trade.profit() * btc_pair.price,
-//             profit_as_percent = print_percent(trade.profit_as_percent()),
-//         )
-//     }
-// }
-
 fn size(presenter: TradePresenter) -> String {
     format!(
         "{:.2} (${:.0})",

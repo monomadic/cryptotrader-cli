@@ -17,22 +17,24 @@ where
         {
             if asset.amount > 0.01 {
                 let trades = client.trades_for_pair(btc_pair_for_asset.clone())?;
+
                 // combine and average into BUY-SELL-BUY-SELL array
                 let trades = group_and_average_trades_by_trade_type(trades);
 
-                let fiat_pair = client.fiat_pair_for(&asset.symbol, pairs.clone());
+                // let fiat_pair = client.fiat_pair_for(&asset.symbol, pairs.clone());
+                let fiat_pair = client.btc_pair(pairs.clone());
 
                 // filter out the SELLs
-                let trades:Vec<Trade> = trades.into_iter().filter(|trade| trade.trade_type == TradeType::Buy).collect();
+                let trades: Vec<Trade> = trades
+                    .into_iter()
+                    .filter(|trade| trade.trade_type == TradeType::Buy)
+                    .collect();
 
                 // take the most recent (open) trade
-                if let Some(trade) = trades.last().map(|t|t.clone()) {
+                if let Some(trade) = trades.last().map(|t| t.clone()) {
                     // let symbol_pairs = find_all_pairs_by_symbol(&asset.symbol, pairs.clone());
 
-                    result_buffer.push(TradePresenter {
-                        trade,
-                        fiat_pair,
-                    });
+                    result_buffer.push(TradePresenter { trade, fiat_pair });
                 }
             }
         }
