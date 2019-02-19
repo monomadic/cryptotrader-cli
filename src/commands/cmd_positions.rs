@@ -3,22 +3,11 @@ use cryptotrader;
 use cryptotrader::{exchanges::*, models::*, presenters::*};
 use log::info;
 
-pub fn fetch<E>(client: E) -> CliResult<Vec<PositionPresenter>>
+pub fn fetch<E>(client: E) -> CliResult<Vec<TradePresenter>>
 where
     E: ExchangeAPI,
 {
-    info!("client: balances()");
     let assets = client.balances()?;
-    info!(
-        "response: found assets: {}",
-        assets
-            .clone()
-            .into_iter()
-            .map(|p| p.symbol)
-            .collect::<Vec<String>>()
-            .join(", ")
-    );
-
     let pairs = client.all_pairs()?;
 
     let mut result_buffer = Vec::new();
@@ -26,16 +15,64 @@ where
         if let Some(btc_pair_for_asset) =
             find_pair_by_symbol_and_base(&asset.symbol, &client.btc_symbol(), pairs.clone())
         {
-            let trades = client.trades_for_pair(btc_pair_for_asset)?;
-            let positions = Position::new(trades, asset.amount);
+            if asset.amount > 0.01 {
+                let trades = client.trades_for_pair(btc_pair_for_asset.clone())?;
+                // combine and average into BUY-SELL-BUY-SELL array
+                let trades = group_and_average_trades_by_trade_type(trades);
 
-            if let Some(position) = positions.last() {
-                let symbol_pairs = find_all_pairs_by_symbol(&asset.symbol, pairs.clone());
-                result_buffer.push(PositionPresenter::new(position.clone(), symbol_pairs));
+                // filter out the SELLs
+                let trades:Vec<Trade> = trades.into_iter().filter(|trade| trade.trade_type == TradeType::Buy).collect();
+
+                // take the most recent (open) trade
+                if let Some(trade) = trades.last() {
+                    // let symbol_pairs = find_all_pairs_by_symbol(&asset.symbol, pairs.clone());
+
+                    result_buffer.push(TradePresenter {
+                        trade: trade.clone(),
+                        fiat_pair: Some(btc_pair_for_asset.clone()),
+                    });
+                }
             }
         }
     }
 
-    info!("position presenters: {:#?}", result_buffer);
+    info!("trade presenters: {:#?}", result_buffer);
     Ok(result_buffer)
 }
+
+// pub fn fetch<E>(client: E) -> CliResult<Vec<PositionPresenter>>
+// where
+//     E: ExchangeAPI,
+// {
+//     info!("client: balances()");
+//     let assets = client.balances()?;
+//     info!(
+//         "response: found assets: {}",
+//         assets
+//             .clone()
+//             .into_iter()
+//             .map(|p| p.symbol)
+//             .collect::<Vec<String>>()
+//             .join(", ")
+//     );
+
+//     let pairs = client.all_pairs()?;
+
+//     let mut result_buffer = Vec::new();
+//     for asset in assets {
+//         if let Some(btc_pair_for_asset) =
+//             find_pair_by_symbol_and_base(&asset.symbol, &client.btc_symbol(), pairs.clone())
+//         {
+//             let trades = client.trades_for_pair(btc_pair_for_asset)?;
+//             let positions = Position::new(trades, asset.amount);
+
+//             if let Some(position) = positions.last() {
+//                 let symbol_pairs = find_all_pairs_by_symbol(&asset.symbol, pairs.clone());
+//                 result_buffer.push(PositionPresenter::new(position.clone(), symbol_pairs));
+//             }
+//         }
+//     }
+
+//     info!("position presenters: {:#?}", result_buffer);
+//     Ok(result_buffer)
+// }

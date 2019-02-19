@@ -13,7 +13,7 @@ pub use self::display_trade_type as trade_type;
 
 static SMALL_COLUMN_WIDTH: usize = 8;
 static NORMAL_COLUMN_WIDTH: usize = 16;
-// static WIDE_COLUMN_WIDTH: usize = 32;
+static WIDE_COLUMN_WIDTH: usize = 24;
 
 fn print_bool(condition: bool) -> String {
     match condition {
@@ -25,7 +25,7 @@ fn print_bool(condition: bool) -> String {
 fn positive_negative(number: f64, string: String) -> ColoredString {
     if number > 0.01 {
         string.green()
-    } else if number < 0.01 {
+    } else if number < -0.01 {
         string.red()
     } else {
         string.normal()

@@ -48,3 +48,8 @@ subcommands:
                 required: false
                 takes_value: false
                 multiple: false
+            - format:
+                long: format
+                help: Displays the data in different layouts
+                possible_values: [ table, ticker ]
+                takes_value: true

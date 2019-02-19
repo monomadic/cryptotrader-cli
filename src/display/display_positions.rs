@@ -1,5 +1,6 @@
 use super::*;
 use cryptotrader::presenters::*;
+use log::info;
 
 pub fn ticker(presenters: Vec<PositionPresenter>) -> String {
     presenters
@@ -30,11 +31,12 @@ pub fn table(presenters: Vec<PositionPresenter>) -> String {
         "SYMBOL", " ", "SIZE", "UPNL", "RPNL", "ENTRY", "EXIT",
         &presenters.into_iter().map(|presenter| {
             let position = presenter.position.clone();
+            info!("table({})", position.symbol());
 
             format!("{symbol:12}{valid:1}{size:<32}{upnl:50}{rpnl:<50}{entry_price:<16.8}{exit_price:<16}",
                 symbol                      = position.symbol().yellow(),
                 valid                       = print_bool(presenter.is_valid()),
-                size                        = format!("{:.2} ({:.2} btc, ${:.2})", presenter.qty(), presenter.current_value_in_btc(), presenter.current_value_in_usd()),
+                size                        = size(presenter.clone()),
                 upnl                        = positive_negative(presenter.percent_change(), format!("{:.2}%", presenter.percent_change())),
                 rpnl                        = positive_negative(presenter.unrealised_profit_usd(), format!("(${:.2})", presenter.unrealised_profit_usd())),
                 entry_price                 = position.entry_price(),
@@ -42,4 +44,13 @@ pub fn table(presenters: Vec<PositionPresenter>) -> String {
             )
         }
     ).collect::<Vec<String>>().join("\n"))
+}
+
+fn size(presenter: PositionPresenter) -> String {
+    format!(
+        "{:.2} ({:.2} btc, ${:.2})",
+        presenter.qty(),
+        presenter.current_value_in_btc(),
+        presenter.current_value_in_usd(),
+    )
 }
