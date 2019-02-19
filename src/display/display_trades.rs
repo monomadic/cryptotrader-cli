@@ -2,7 +2,7 @@ use super::*;
 use crate::display;
 // use colored::*;
 use cryptotrader;
-// use cryptotrader::models::*;
+use cryptotrader::models::*;
 use cryptotrader::presenters::TradePresenter;
 
 pub fn ticker(presenters: Vec<Vec<TradePresenter>>) -> String {
@@ -43,7 +43,8 @@ pub fn table(presenters: Vec<Vec<TradePresenter>>) -> String {
                 .into_iter()
                 .map(|trade_presenter| table_row(trade_presenter.clone())) // FIX THIS
                 .collect::<Vec<String>>()
-                .join("\n")})
+                .join("\n")
+        })
         .collect::<Vec<String>>()
         .join("\n");
 
@@ -73,7 +74,7 @@ fn table_row(presenter: TradePresenter) -> String {
         trade_type = display::trade_type::colored(trade.trade_type),
         entry_price = display::pairs::pretty_price_from_base(&trade.pair.base, trade.price),
         size = size(presenter.clone()),
-        qty = trade.qty,
+        qty = display_qty(trade.qty),
         current_price = display::pairs::pretty_price_from_base(&trade.pair.base, trade.pair.price),
         fee = format!(
             "{:.3} {}",
@@ -88,35 +89,33 @@ fn table_row(presenter: TradePresenter) -> String {
     )
 }
 
-fn display_profit(trade_presenter: TradePresenter) -> String {
-    let profit_in_fiat: String = {
-        if let Some(profit) = trade_presenter.current_profit_in_fiat() {
-            format!(" (${:.2})", profit)
-        } else {
-            "".to_string()
-        }
+fn display_profit(presenter: TradePresenter) -> String {
+    let current_profit_as_percent: f64 = presenter.trade.current_profit_as_percent();
+    let current_profit_in_fiat: String = match presenter.current_profit_in_fiat() {
+        Some(profit) => format!(" ({})", print_fiat(profit)),
+        None => "".to_string(),
     };
-    let trade = trade_presenter.trade;
 
-    if trade.pair.base_is_fiat() {
-        format!(
-            "{profit:.2} ({profit_as_percent})",
-            profit = print_fiat(trade.profit()),
-            profit_as_percent = print_percent(trade.current_profit_as_percent()),
-        )
-    } else {
-        format!(
-            "{profit_as_percent}{profit_in_fiat}",
-            profit_in_fiat = profit_in_fiat,
-            profit_as_percent = print_percent(trade.current_profit_as_percent()),
-        )
-    }
+    format!(
+        "{}{}",
+        print_percent(current_profit_as_percent),
+        current_profit_in_fiat,
+    )
 }
 
 fn size(presenter: TradePresenter) -> String {
-    format!(
-        "{:.2} (${:.0})",
-        presenter.trade.value(),
-        presenter.current_cost_in_fiat().expect("trade presenter thing"),
-    )
+    match presenter.trade.pair.base_type() {
+        AssetType::Fiat => format!("${:.2}", presenter.trade.value()),
+        AssetType::Bitcoin | AssetType::Altcoin => format!(
+            "{:.2} (${:.0})",
+            presenter.trade.value(),
+            presenter
+                .current_cost_in_fiat()
+                .expect("trade presenter thing"),
+        ),
+    }
+}
+
+fn display_qty(qty: f64) -> String {
+    format!("{:.2}", qty)
 }

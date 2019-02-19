@@ -2,7 +2,6 @@ use crate::display;
 use crate::error::*;
 use cryptotrader;
 use cryptotrader::{exchanges::*, models::*};
-use log::info;
 
 pub fn fetch<E>(client: E, symbols: Vec<&str>) -> CliResult<String>
 where
