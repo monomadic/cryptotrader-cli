@@ -30,6 +30,8 @@ pub fn parse() -> CliResult<String> {
         ("positions", Some(m)) => parse_positions(m, client),
         ("pairs", Some(m)) => parse_pairs(m, client),
         ("trades", Some(m)) => parse_trades(m, client),
+        ("orders", Some(m)) => parse_orders(m, client),
+        ("funds", Some(m)) => parse_funds(m, client),
         _ => Err(Box::new(CliError::ArgumentError(
             "Invalid Argument".to_string(),
         ))),
@@ -60,11 +62,28 @@ fn parse_format(matches: &ArgMatches) -> DisplayFormat {
     }
 }
 
+fn parse_orders<E>(matches: &ArgMatches, client: E) -> CliResult<String> {
+    Ok("incomplete".to_string())
+}
+
+fn parse_funds<E>(matches: &ArgMatches, client: E) -> CliResult<String>
+where
+    E: ExchangeAPI,
+{
+    let opening_balance: Option<f64> = matches
+        .value_of("opening_balance")
+        .and_then(|b| b.parse::<f64>().ok());
+
+    let presenter = commands::funds::fetch(client)?;
+
+    Ok(display::funds::ticker(presenter, opening_balance))
+}
+
 fn parse_positions<E>(matches: &ArgMatches, client: E) -> CliResult<String>
 where
     E: ExchangeAPI,
 {
-    let positions: Vec<Vec<TradePresenter>> = vec![crate::commands::positions::fetch(client)?];
+    let positions: Vec<Vec<TradePresenter>> = commands::positions::fetch(client)?;
 
     Ok(match parse_format(matches) {
         DisplayFormat::Table => display::trades::table(positions),
@@ -84,7 +103,9 @@ fn parse_trades<E>(matches: &ArgMatches, client: E) -> CliResult<String>
 where
     E: ExchangeAPI,
 {
-    let limit = parse_limit(matches.value_of("limit"));
+    let limit = matches
+        .value_of("limit")
+        .and_then(|b| b.parse::<usize>().ok());
 
     if let Some(symbol) = matches.value_of("symbol") {
         let trades = commands::trades::fetch(client, symbol, limit, matches.is_present("group"))?;
@@ -99,6 +120,6 @@ where
     }
 }
 
-fn parse_limit(limit: Option<&str>) -> Option<usize> {
-    limit.map(|l| l.parse::<usize>().ok()).unwrap_or(None)
-}
+// fn parse_limit(limit: Option<&str>) -> Option<usize> {
+//     limit.map(|l| l.parse::<usize>().ok()).unwrap_or(None)
+// }

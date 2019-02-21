@@ -3,7 +3,7 @@ use cryptotrader;
 use cryptotrader::{exchanges::*, models::*, presenters::*};
 use log::info;
 
-pub fn fetch<E>(client: E) -> CliResult<Vec<TradePresenter>>
+pub fn fetch<E>(client: E) -> CliResult<Vec<Vec<TradePresenter>>>
 where
     E: ExchangeAPI,
 {
@@ -15,7 +15,7 @@ where
         if let Some(btc_pair_for_asset) =
             find_pair_by_symbol_and_base(&asset.symbol, &client.btc_symbol(), pairs.clone())
         {
-            if asset.amount > 0.01 {
+            if asset.amount >= 1.0 {
                 let trades = client.trades_for_pair(btc_pair_for_asset.clone())?;
 
                 // combine and average into BUY-SELL-BUY-SELL array
@@ -34,7 +34,7 @@ where
                 if let Some(trade) = trades.last().map(|t| t.clone()) {
                     // let symbol_pairs = find_all_pairs_by_symbol(&asset.symbol, pairs.clone());
 
-                    result_buffer.push(TradePresenter { trade, fiat_pair });
+                    result_buffer.push(vec![TradePresenter { trade, fiat_pair }]);
                 }
             }
         }

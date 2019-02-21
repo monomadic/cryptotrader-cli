@@ -9,15 +9,22 @@ args:
         multiple: true
         help: Sets the level of verbosity
 subcommands:
+    - orders:
+        about: Displays all open orders.
+    - funds:
+        about: Shows all assets held on the exchange.
+        args:
+            - opening_balance:
+                long: opening_balance
+                short: open
+                help: calculate profit from a daily opening balance
+                takes_value: true
     - pairs:
         about: Displays all pairs on the exchange.
     - positions:
         about: Evaluates open positions
         short: p
         args:
-            - ticker:
-                short: t
-                help: ticker display
             - format:
                 long: format
                 help: Displays the data in different layouts

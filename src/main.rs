@@ -6,6 +6,8 @@ mod commands {
     pub use self::cmd_positions as positions;
     pub mod cmd_trades;
     pub use self::cmd_trades as trades;
+    pub mod cmd_funds;
+    pub use self::cmd_funds as funds;
 }
 mod display;
 mod error;

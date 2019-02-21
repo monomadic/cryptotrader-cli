@@ -10,6 +10,8 @@ pub mod display_trades;
 pub use self::display_trades as trades;
 pub mod display_trade_type;
 pub use self::display_trade_type as trade_type;
+pub mod display_funds;
+pub use self::display_funds as funds;
 
 static SMALL_COLUMN_WIDTH: usize = 8;
 static NORMAL_COLUMN_WIDTH: usize = 16;
