@@ -8,6 +8,8 @@ mod commands {
     pub use self::cmd_trades as trades;
     pub mod cmd_funds;
     pub use self::cmd_funds as funds;
+    pub mod cmd_orders;
+    pub use self::cmd_orders as orders;
 }
 mod display;
 mod error;

@@ -7,7 +7,6 @@ use clap;
 use clap::{load_yaml, AppSettings, ArgMatches};
 use cryptotrader::presenters::TradePresenter;
 use cryptotrader::{exchanges::binance::BinanceAPI, exchanges::ExchangeAPI};
-// use log::info;
 
 use crate::commands;
 use crate::display;
@@ -62,8 +61,12 @@ fn parse_format(matches: &ArgMatches) -> DisplayFormat {
     }
 }
 
-fn parse_orders<E>(matches: &ArgMatches, client: E) -> CliResult<String> {
-    Ok("incomplete".to_string())
+fn parse_orders<E>(matches: &ArgMatches, client: E) -> CliResult<String>
+where
+    E: ExchangeAPI,
+{
+    let orders = commands::orders::fetch(client)?;
+    Ok(display::orders::table(orders))
 }
 
 fn parse_funds<E>(matches: &ArgMatches, client: E) -> CliResult<String>

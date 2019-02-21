@@ -1,7 +1,6 @@
+use super::*;
 use cryptotrader;
 use cryptotrader::models::*;
-use super::*;
-// use colored::*;
 
 type PairMap = HashMap<String, Vec<Pair>>;
 use std::collections::HashMap;
