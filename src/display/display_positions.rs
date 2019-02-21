@@ -27,26 +27,33 @@ pub fn ticker(presenters: Vec<PositionPresenter>) -> String {
 
 pub fn table(presenters: Vec<PositionPresenter>) -> String {
     format!(
-        "{:12}{:1}{:32}{:50}{:50}{:16}{:16}\n{}",
-        "SYMBOL", " ", "SIZE", "UPNL", "RPNL", "ENTRY", "EXIT",
+        "{:normal_width$}{:1}{:wide_width$}{:normal_width$}{:normal_width$}{:wide_width$}{:wide_width$}{:wide_width$}\n{}",
+        "SYMBOL", " ", "SIZE", "ENTRY_PRICE", "EXIT_PRICE", "UPNL", "RPNL","TIME",
         &presenters.into_iter().map(|presenter| {
             let position = presenter.position.clone();
             info!("table({})", position.symbol());
 
-            format!("{symbol:12}{valid:1}{size:<32}{upnl:50}{rpnl:<50}{entry_price:<16.8}{exit_price:<16}",
+            format!("{symbol:normal_width$}{valid:1}{size:<wide_width$}{entry_price:<normal_width$.8}{exit_price:<normal_width$}{upnl:wide_width$}{rpnl:<wide_width$}{time:<normal_width$}",
                 symbol                      = position.symbol().yellow(),
                 valid                       = print_bool(presenter.is_valid()),
-                size                        = size(presenter.clone()),
-                upnl                        = positive_negative(presenter.percent_change(), format!("{:.2}%", presenter.percent_change())),
-                rpnl                        = positive_negative(presenter.unrealised_profit_usd(), format!("(${:.2})", presenter.unrealised_profit_usd())),
+                size                        = display_size(presenter.clone()),
+                upnl                        = display_profit(presenter.percent_change(), presenter.unrealised_profit_usd()),
+                rpnl                        = display_profit(presenter.percent_change(), presenter.realised_profit_usd()),
                 entry_price                 = position.entry_price(),
                 exit_price                  = position.exit_price().map_or("".to_string(), |m| format!("{:.8}", m)),
+                time = presenter.position.trades.first().map(|trade| trade.time.format("%Y-%m-%d %H:%M").to_string()).unwrap_or("-".to_string()),
+                normal_width = NORMAL_COLUMN_WIDTH,
+
+        wide_width = WIDE_COLUMN_WIDTH
             )
-        }).collect::<Vec<String>>().join("\n")
+        }).collect::<Vec<String>>().join("\n"),
+        normal_width = NORMAL_COLUMN_WIDTH,
+
+        wide_width = WIDE_COLUMN_WIDTH
     )
 }
 
-fn size(presenter: PositionPresenter) -> String {
+fn display_size(presenter: PositionPresenter) -> String {
     format!(
         "{:.2} ({:.2} btc, ${:.2})",
         presenter.qty(),
@@ -54,3 +61,32 @@ fn size(presenter: PositionPresenter) -> String {
         presenter.current_value_in_usd(),
     )
 }
+
+fn display_profit(percent_change: f64, unrealised_profit_usd: f64) -> colored::ColoredString {
+    if unrealised_profit_usd == 0.0 {
+        "".black()
+    } else {
+        positive_negative(
+            percent_change,
+            format!(
+                "{} ({})",
+                print_percent(percent_change),
+                print_fiat(unrealised_profit_usd),
+            ),
+        )
+    }
+}
+
+// fn display_unrealised_profit(presenter: &PositionPresenter) -> String {
+//     // let current_profit_as_percent: f64 = presenter.trade.current_profit_as_percent();
+//     // let current_profit_in_fiat: String = match presenter.realised_profit_usd() {
+//     //     Some(profit) => format!(" ({})", print_fiat(profit)),
+//     //     None => "".to_string(),
+//     // };
+
+//     format!(
+//         "{} ({})",
+//         print_percent(presenter.percent_change()),
+//         print_fiat(presenter.unrealised_profit_usd()),
+//     )
+// }

@@ -17,7 +17,7 @@ pub use self::display_orders as orders;
 
 static SMALL_COLUMN_WIDTH: usize = 8;
 static NORMAL_COLUMN_WIDTH: usize = 16;
-static WIDE_COLUMN_WIDTH: usize = 24;
+static WIDE_COLUMN_WIDTH: usize = 32;
 
 fn print_bool(condition: bool) -> String {
     match condition {

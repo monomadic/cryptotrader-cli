@@ -86,12 +86,13 @@ fn parse_positions<E>(matches: &ArgMatches, client: E) -> CliResult<String>
 where
     E: ExchangeAPI,
 {
-    let positions: Vec<Vec<TradePresenter>> = commands::positions::fetch(client)?;
+    // let positions: Vec<Vec<TradePresenter>> = commands::positions::fetch(client)?;
+    let positions = commands::positions::fetch(client)?;
 
     Ok(match parse_format(matches) {
-        DisplayFormat::Table => display::trades::table(positions),
-        DisplayFormat::Ticker => display::trades::ticker(positions),
-        DisplayFormat::Default => display::trades::table(positions),
+        DisplayFormat::Table => display::positions::table(positions),
+        DisplayFormat::Ticker => display::positions::ticker(positions),
+        DisplayFormat::Default => display::positions::table(positions),
     })
 }
 
