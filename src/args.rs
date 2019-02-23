@@ -5,7 +5,6 @@
 
 use clap;
 use clap::{load_yaml, AppSettings, ArgMatches};
-use cryptotrader::presenters::TradePresenter;
 use cryptotrader::{exchanges::binance::BinanceAPI, exchanges::ExchangeAPI};
 
 use crate::commands;

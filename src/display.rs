@@ -48,10 +48,10 @@ fn print_fiat(num: f64) -> String {
     }
 }
 
-fn print_btc(num: f64) -> String {
-    if num < 1.0 {
-        format!("{:.8}", num)
-    } else {
-        format!("{:.4}", num)
-    }
-}
+// fn print_btc(num: f64) -> String {
+//     if num < 1.0 {
+//         format!("{:.8}", num)
+//     } else {
+//         format!("{:.4}", num)
+//     }
+// }
