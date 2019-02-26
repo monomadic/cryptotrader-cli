@@ -10,3 +10,4 @@ log = "0.4.5"
 simple_logger = "1.0.1"
 cryptotrader = { path = "../cryptotrader-core" }
 colored = "1.7"
+prettytable-rs = "^0.8"

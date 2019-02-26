@@ -19,6 +19,19 @@ static SMALL_COLUMN_WIDTH: usize = 8;
 static NORMAL_COLUMN_WIDTH: usize = 16;
 static WIDE_COLUMN_WIDTH: usize = 32;
 
+use prettytable::format::TableFormat;
+fn table_format() -> TableFormat {
+    prettytable::format::FormatBuilder::new()
+        .column_separator(' ')
+        .borders(' ')
+        // .separators(
+        //     &[LinePosition::Top, LinePosition::Bottom],
+        //     LineSeparator::new('▬', '▬', '●', '●'),
+        // )
+        .padding(1, 1)
+        .build()
+}
+
 fn print_bool(condition: bool) -> String {
     match condition {
         true => "".to_string(),

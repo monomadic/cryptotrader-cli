@@ -1,9 +1,8 @@
 use crate::display::positive_negative;
+use colored::*;
 use cryptotrader;
 use cryptotrader::models::*;
 use cryptotrader::presenters::*;
-
-use colored::*;
 
 pub fn ticker(presenter: BalancePresenter, opening_balance: Option<f64>) -> String {
     format!(

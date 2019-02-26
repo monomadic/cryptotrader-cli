@@ -1,6 +1,8 @@
 use super::*;
+use cryptotrader::models::AssetType;
 use cryptotrader::presenters::*;
 use log::info;
+use prettytable::{cell, row, Row, Table};
 
 pub fn ticker(presenters: Vec<PositionPresenter>) -> String {
     presenters
@@ -25,33 +27,86 @@ pub fn ticker(presenters: Vec<PositionPresenter>) -> String {
         .join(" :: ")
 }
 
-pub fn table(presenters: Vec<PositionPresenter>) -> String {
-    format!(
-        "{:normal_width$}{:1}{:wide_width$}{:normal_width$}{:normal_width$}{:wide_width$}{:wide_width$}{:wide_width$}\n{}",
-        "SYMBOL", " ", "SIZE", "ENTRY_PRICE", "EXIT_PRICE", "UPNL", "RPNL","TIME",
-        &presenters.into_iter().map(|presenter| {
-            let position = presenter.position.clone();
-            info!("table({})", position.symbol());
-
-            format!("{symbol:normal_width$}{valid:1}{size:<wide_width$}{entry_price:<normal_width$.8}{exit_price:<normal_width$}{upnl:wide_width$}{rpnl:<wide_width$}{time:<normal_width$}",
-                symbol                      = position.symbol().yellow(),
-                valid                       = print_bool(presenter.is_valid()),
-                size                        = display_size(presenter.clone()),
-                upnl                        = display_profit(presenter.percent_change(), presenter.unrealised_profit_usd()),
-                rpnl                        = display_profit(presenter.percent_change(), presenter.realised_profit_usd()),
-                entry_price                 = position.entry_price(),
-                exit_price                  = position.exit_price().map_or("".to_string(), |m| format!("{:.8}", m)),
-                time = presenter.position.trades.first().map(|trade| trade.time.format("%Y-%m-%d %H:%M").to_string()).unwrap_or("-".to_string()),
-                normal_width = NORMAL_COLUMN_WIDTH,
-
-        wide_width = WIDE_COLUMN_WIDTH
-            )
-        }).collect::<Vec<String>>().join("\n"),
-        normal_width = NORMAL_COLUMN_WIDTH,
-
-        wide_width = WIDE_COLUMN_WIDTH
-    )
+pub fn table_row(presenter: &PositionPresenter) -> Row {
+    Row::new(vec![
+        cell!(presenter.symbol().yellow()),
+        cell!(display_size(presenter.clone())),
+        cell!(display_number_by_asset_type(
+            presenter.position.entry_price(),
+            presenter.position.asset.asset_type()
+        )),
+        cell!(presenter
+            .position
+            .exit_price()
+            .map_or("".to_string(), |exit_price| display_number_by_asset_type(
+                exit_price,
+                presenter.position.asset.asset_type()
+            ))),
+        cell!(display_profit(
+            presenter.percent_change(),
+            presenter.unrealised_profit_usd(),
+        )
+        .to_string()),
+        cell!(display_profit(
+            presenter.percent_change(),
+            presenter.realised_profit_usd()
+        )),
+        cell!(presenter
+            .position
+            .trades
+            .first()
+            .map(|trade| trade.time.format("%Y-%m-%d %H:%M").to_string())
+            .unwrap_or("-".to_string())),
+    ])
 }
+
+pub fn table(presenters: Vec<PositionPresenter>) -> String {
+    let mut table = Table::new();
+    table.set_format(table_format());
+    table.set_titles(row!(
+        "SYMBOL",
+        "SIZE",
+        "ENTRY_PRICE",
+        "EXIT_PRICE",
+        "UPNL",
+        "RPNL",
+        "TIME"
+    ));
+
+    for presenter in presenters {
+        table.add_row(table_row(&presenter));
+    }
+
+    format!("{}", table)
+}
+
+// pub fn _table(presenters: Vec<PositionPresenter>) -> String {
+//     format!(
+//         "{:normal_width$}{:1}{:wide_width$}{:normal_width$}{:normal_width$}{:wide_width$}{:wide_width$}{:wide_width$}\n{}",
+//         "SYMBOL", " ", "SIZE", "ENTRY_PRICE", "EXIT_PRICE", "UPNL", "RPNL","TIME",
+//         &presenters.into_iter().map(|presenter| {
+//             let position = presenter.position.clone();
+//             info!("table({})", position.symbol());
+
+//             format!("{symbol:normal_width$}{valid:1}{size:<wide_width$}{entry_price:<normal_width$.8}{exit_price:<normal_width$}{upnl:wide_width$}{rpnl:<wide_width$}{time:<normal_width$}",
+//                 symbol                      = position.symbol().yellow(),
+//                 valid                       = print_bool(presenter.is_valid()),
+//                 size                        = display_size(presenter.clone()),
+//                 upnl                        = display_profit(presenter.percent_change(), presenter.unrealised_profit_usd()),
+//                 rpnl                        = display_profit(presenter.percent_change(), presenter.realised_profit_usd()),
+//                 entry_price                 = position.entry_price(),
+//                 exit_price                  = position.exit_price().map_or("".to_string(), |m| format!("{:.8}", m)),
+//                 time = presenter.position.trades.first().map(|trade| trade.time.format("%Y-%m-%d %H:%M").to_string()).unwrap_or("-".to_string()),
+//                 normal_width = NORMAL_COLUMN_WIDTH,
+
+//         wide_width = WIDE_COLUMN_WIDTH
+//             )
+//         }).collect::<Vec<String>>().join("\n"),
+//         normal_width = NORMAL_COLUMN_WIDTH,
+
+//         wide_width = WIDE_COLUMN_WIDTH
+//     )
+// }
 
 fn display_size(presenter: PositionPresenter) -> String {
     format!(
@@ -77,16 +132,10 @@ fn display_profit(percent_change: f64, unrealised_profit_usd: f64) -> colored::C
     }
 }
 
-// fn display_unrealised_profit(presenter: &PositionPresenter) -> String {
-//     // let current_profit_as_percent: f64 = presenter.trade.current_profit_as_percent();
-//     // let current_profit_in_fiat: String = match presenter.realised_profit_usd() {
-//     //     Some(profit) => format!(" ({})", print_fiat(profit)),
-//     //     None => "".to_string(),
-//     // };
-
-//     format!(
-//         "{} ({})",
-//         print_percent(presenter.percent_change()),
-//         print_fiat(presenter.unrealised_profit_usd()),
-//     )
-// }
+fn display_number_by_asset_type(value: f64, asset_type: AssetType) -> String {
+    match asset_type {
+        AssetType::Fiat => format!("${:.2}", value),
+        AssetType::Bitcoin => format!("{:.8}", value),
+        AssetType::Altcoin => format!("{:.8}", value),
+    }
+}
