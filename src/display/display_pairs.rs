@@ -7,12 +7,13 @@ use std::collections::HashMap;
 
 pub fn table(pairs: PairMap, base_pairs: Vec<String>) -> String {
     let mut output_buffer = format!("{:16}", "");
+    let btc_price_in_usd = 4000.0;
 
     output_buffer.push_str(
         &base_pairs
             .clone()
             .into_iter()
-            .map(|symbol| format!("{:16}", symbol.yellow()))
+            .map(|symbol| format!("{:32}", symbol.yellow()))
             .collect::<Vec<String>>()
             .join(""),
     );
@@ -33,9 +34,28 @@ pub fn table(pairs: PairMap, base_pairs: Vec<String>) -> String {
                             if let Some(pair) =
                                 pairs.clone().into_iter().find(|p| p.base == base_pair)
                             {
-                                format!("{:<16}", pair.price)
+                                format!(
+                                    "{:<32}",
+                                    match AssetType::from_symbol(&base_pair) {
+                                        AssetType::Fiat => format!(
+                                            "${:.2} ({:.8})",
+                                            pair.price,
+                                            pair.price / btc_price_in_usd
+                                        ),
+                                        AssetType::Bitcoin => format!(
+                                            "{:.8} (${:.2})",
+                                            pair.price,
+                                            pair.price * btc_price_in_usd
+                                        ),
+                                        AssetType::Altcoin => format!(
+                                            "{:.8} (${:.2})",
+                                            pair.price,
+                                            pair.price * btc_price_in_usd
+                                        ),
+                                    }
+                                )
                             } else {
-                                format!("{:<16}", "-")
+                                format!("{:<32}", "-")
                             }
                         })
                         .collect::<Vec<String>>()
