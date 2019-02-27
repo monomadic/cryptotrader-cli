@@ -1,7 +1,6 @@
 use super::*;
 use cryptotrader::models::AssetType;
 use cryptotrader::presenters::*;
-use log::info;
 use prettytable::{cell, row, Row, Table};
 
 pub fn ticker(presenters: Vec<PositionPresenter>) -> String {
@@ -28,36 +27,33 @@ pub fn ticker(presenters: Vec<PositionPresenter>) -> String {
 }
 
 pub fn table_row(presenter: &PositionPresenter) -> Row {
-    Row::new(vec![
-        cell!(presenter.symbol().yellow()),
-        cell!(display_size(presenter.clone())),
-        cell!(display_number_by_asset_type(
+    row!(
+        presenter.symbol().yellow(),
+        display_size(presenter.clone()),
+        display_number_by_asset_type(
             presenter.position.entry_price(),
             presenter.position.asset.asset_type()
-        )),
-        cell!(presenter
+        ),
+        presenter
             .position
             .exit_price()
             .map_or("".to_string(), |exit_price| display_number_by_asset_type(
                 exit_price,
                 presenter.position.asset.asset_type()
-            ))),
-        cell!(display_profit(
+            )),
+        display_profit(
             presenter.percent_change(),
-            presenter.unrealised_profit_usd(),
+            presenter.unrealised_profit_usd()
         )
-        .to_string()),
-        cell!(display_profit(
-            presenter.percent_change(),
-            presenter.realised_profit_usd()
-        )),
-        cell!(presenter
+        .to_string(),
+        display_profit(presenter.percent_change(), presenter.realised_profit_usd()),
+        presenter
             .position
             .trades
             .first()
             .map(|trade| trade.time.format("%Y-%m-%d %H:%M").to_string())
-            .unwrap_or("-".to_string())),
-    ])
+            .unwrap_or("-".to_string())
+    )
 }
 
 pub fn table(presenters: Vec<PositionPresenter>) -> String {

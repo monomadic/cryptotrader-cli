@@ -30,6 +30,7 @@ pub fn parse() -> CliResult<String> {
         ("trades", Some(m)) => parse_trades(m, client),
         ("orders", Some(m)) => parse_orders(m, client),
         ("funds", Some(m)) => parse_funds(m, client),
+        ("scan", Some(m)) => parse_scan(m, client),
         _ => Err(Box::new(CliError::ArgumentError(
             "Invalid Argument".to_string(),
         ))),
@@ -100,6 +101,13 @@ where
     E: ExchangeAPI,
 {
     crate::commands::pairs::fetch(client, vec!["BTC", "BNB", "LINK", "BTT"])
+}
+
+fn parse_scan<E>(_matches: &ArgMatches, client: E) -> CliResult<String>
+where
+    E: ExchangeAPI,
+{
+    Ok("scan".to_string())
 }
 
 fn parse_trades<E>(matches: &ArgMatches, client: E) -> CliResult<String>
