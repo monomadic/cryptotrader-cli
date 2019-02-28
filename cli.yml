@@ -9,6 +9,13 @@ args:
         multiple: true
         help: Sets the level of verbosity
 subcommands:
+    - scan:
+        about: Scans all markets for buying/selling opportunities.
+        args:
+            - pairs:
+                takes_value: true
+                multiple: true
+                required: true
     - orders:
         about: Displays all open orders.
     - funds:

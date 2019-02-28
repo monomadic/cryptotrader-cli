@@ -39,7 +39,8 @@ fn print_bool(condition: bool) -> String {
     }
 }
 
-fn positive_negative(number: f64, string: String) -> ColoredString {
+// TODO: make private
+pub fn positive_negative(number: f64, string: String) -> ColoredString {
     if number > 0.01 {
         string.green()
     } else if number < -0.01 {

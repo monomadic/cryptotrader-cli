@@ -28,13 +28,13 @@ pub fn ticker(presenters: Vec<PositionPresenter>) -> String {
 
 pub fn table_row(presenter: &PositionPresenter) -> Row {
     row!(
-        presenter.symbol().yellow(),
-        display_size(presenter.clone()),
+        presenter.symbol().yellow(),     // symbol
+        display_size(presenter.clone()), // size
         display_number_by_asset_type(
-            presenter.position.entry_price(),
+            presenter.position.entry_price(), // entry price
             presenter.position.asset.asset_type()
         ),
-        presenter
+        presenter // exit price
             .position
             .exit_price()
             .map_or("".to_string(), |exit_price| display_number_by_asset_type(

@@ -103,11 +103,17 @@ where
     crate::commands::pairs::fetch(client, vec!["BTC", "BNB", "LINK", "BTT"])
 }
 
-fn parse_scan<E>(_matches: &ArgMatches, client: E) -> CliResult<String>
+fn parse_scan<E>(matches: &ArgMatches, client: E) -> CliResult<String>
 where
     E: ExchangeAPI,
 {
-    Ok("scan".to_string())
+    crate::commands::scan::fetch(
+        client,
+        matches
+            .values_of("pairs")
+            .ok_or(CliError::ArgumentError("pairs not found".to_string()))?
+            .collect(),
+    )
 }
 
 fn parse_trades<E>(matches: &ArgMatches, client: E) -> CliResult<String>
