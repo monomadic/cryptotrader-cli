@@ -6,6 +6,10 @@ use prettytable::{cell, Row, Table};
 type PairMap = HashMap<String, Vec<Pair>>;
 use std::collections::HashMap;
 
+pub fn display_pair(pair: &Pair) -> String {
+    format!("{}-{}", pair.symbol, pair.base)
+}
+
 fn format_pair(pair: Pair, base_pair: &str) -> String {
     let btc_price_in_usd = 4000.0;
     format!(

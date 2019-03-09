@@ -2,7 +2,9 @@ use crate::display::positive_negative;
 use crate::error::*;
 use crate::utils::*;
 use colored::*;
-use cryptotrader::{exchanges::*, indicators::rsi::*, indicators::sma::*, models::*};
+use cryptotrader::{
+    exchanges::*, indicators::bbands::*, indicators::rsi::*, indicators::sma::*, models::*,
+};
 
 pub fn fetch<E>(client: E, pairs: Vec<&str>) -> CliResult<String>
 where
@@ -41,9 +43,16 @@ where
 {
     let candlesticks = client.chart_data(pair, "1h");
     if let Ok(candlesticks) = candlesticks {
+        use cryptotrader::indicators::macd::*;
+
+        let macd = macd(12, 26, 9, &candlesticks).expect("candlestikcs");
+
+        println!("MACD SCAN: {:?}", score(find_macd_crosses(macd)));
+
         let tests: String = vec![
             test_rsi_under(&candlesticks, 60.1).to_string(),
             test_above_sma(&candlesticks, 99, 200).to_string(),
+            test_bbands(&candlesticks).to_string(),
         ]
         .join("\n");
         format!("{} 1h:\n{}", pair.yellow(), tests)
@@ -52,25 +61,43 @@ where
     }
 }
 
-pub fn strategy_cj<E>(client: &E, pair: &str) -> String
-where
-    E: ExchangeAPI,
-{
-    // let sma99 = *sma(99, &candlesticks).last().unwrap_or(&0.0);
-    // let price: f64 = *candlesticks
-    //     .iter()
-    //     .map(|c| c.close_price)
-    //     .collect::<Vec<f64>>()
-    //     .last()
-    //     .unwrap_or(&0.0);
-    // let percent_sma99 = price_percent(sma99, price);
+// pub fn strategy_cj<E>(client: &E, pair: &str) -> String
+// where
+//     E: ExchangeAPI,
+// {
+//     // let sma99 = *sma(99, &candlesticks).last().unwrap_or(&0.0);
+//     // let price: f64 = *candlesticks
+//     //     .iter()
+//     //     .map(|c| c.close_price)
+//     //     .collect::<Vec<f64>>()
+//     //     .last()
+//     //     .unwrap_or(&0.0);
+//     // let percent_sma99 = price_percent(sma99, price);
 
-    let candlesticks = client.chart_data(pair, "12h");
-    if let Ok(candlesticks) = candlesticks {
-        let tests: String = vec![test_last_golden_cross(&candlesticks).to_string()].join("\n");
-        format!("{} 12h:\n{}", pair.yellow(), tests)
-    } else {
-        "-".to_string()
+//     let candlesticks = client.chart_data(pair, "12h");
+//     if let Ok(candlesticks) = candlesticks {
+//         let tests: String = vec![test_last_golden_cross(&candlesticks).to_string()].join("\n");
+//         format!("{} 12h:\n{}", pair.yellow(), tests)
+//     } else {
+//         "-".to_string()
+//     }
+// }
+
+fn test_bbands(candlesticks: &Vec<Candlestick>) -> TestResult {
+    if let Some(last_candlestick) = candlesticks.last() {
+        if let Some(band) = bbands(20, &candlesticks).last() {
+            return TestResult {
+                display: format!(
+                    "PRICE_ABOVE_LOWER_BOLLINGER_BAND: {:.8}, {:.8} {:?}",
+                    last_candlestick.close_price, band.lower_band, band
+                ),
+                passfail: band.lower_band < last_candlestick.close_price,
+            };
+        }
+    }
+    TestResult {
+        display: format!("test input failure"),
+        passfail: false,
     }
 }
 
@@ -154,3 +181,15 @@ impl std::fmt::Display for TestResult {
         write!(f, "TEST [{}]: {}", passfail, self.display)
     }
 }
+
+// struct Strategy {
+//     pub fn plays: Vec<StrategyPlay>,
+// }
+
+// struct StrategyPlay {
+//     pub entry_bar: u32,
+//     pub entry_price: f64,
+//     pub exit_bar: u32,
+//     pub exit_price: f64,
+//     pub profit_as_percent: f64, // fn
+// }

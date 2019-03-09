@@ -10,14 +10,14 @@ pub fn fetch<E>(
     symbol: &str,
     limit: Option<usize>,
     group: bool,
-) -> CliResult<Vec<Vec<TradePresenter>>>
+) -> CliResult<Vec<TradePresenter>>
 where
     E: ExchangeAPI,
 {
     let pairs = client.all_pairs()?;
     let fiat_pair = client.btc_pair(pairs.clone());
     let pairs = find_all_pairs_by_symbol(&symbol, pairs.clone());
-    let mut all_trades: Vec<Vec<TradePresenter>> = Vec::new();
+    let mut presenters: Vec<TradePresenter> = Vec::new();
 
     info!(
         "found pairs: {}",
@@ -32,16 +32,16 @@ where
         };
         let trades = optional_limit(limit, trades);
 
-        let presenters = trades
-            .into_iter()
-            .map(|trade| TradePresenter {
+        for trade in trades {
+            presenters.push(TradePresenter {
                 trade,
                 fiat_pair: fiat_pair.clone(),
             })
-            .collect();
-
-        all_trades.push(presenters);
+        }
     }
 
-    Ok(all_trades)
+    // sort by date
+    presenters.sort_by(|a, b| a.trade.time.cmp(&b.trade.time));
+
+    Ok(presenters)
 }

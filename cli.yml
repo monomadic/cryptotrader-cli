@@ -37,6 +37,11 @@ subcommands:
                 help: Displays the data in different layouts
                 possible_values: [ table, ticker ]
                 takes_value: true
+            - show-trades:
+                long: show-trades
+                help: Shows the trades encompassed in each position (only shown in table format)
+                short: s
+                takes_value: false
     - trades:
         about: Shows all trades for a specific symbol across all pairs
         args:
@@ -67,3 +72,7 @@ subcommands:
                 help: Displays the data in different layouts
                 possible_values: [ table, ticker ]
                 takes_value: true
+            - only-buys:
+                help: Only show BUY-side trades.
+                takes_value: false
+                required: false

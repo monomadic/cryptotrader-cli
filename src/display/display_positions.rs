@@ -1,4 +1,5 @@
 use super::*;
+use crate::display;
 use cryptotrader::models::AssetType;
 use cryptotrader::presenters::*;
 use prettytable::{cell, row, Row, Table};
@@ -56,7 +57,7 @@ pub fn table_row(presenter: &PositionPresenter) -> Row {
     )
 }
 
-pub fn table(presenters: Vec<PositionPresenter>) -> String {
+pub fn table(presenters: Vec<PositionPresenter>, show_trades: bool) -> String {
     let mut table = Table::new();
     table.set_format(table_format());
     table.set_titles(row!(
@@ -71,6 +72,14 @@ pub fn table(presenters: Vec<PositionPresenter>) -> String {
 
     for presenter in presenters {
         table.add_row(table_row(&presenter));
+        if show_trades {
+            for trade in presenter.position.trades {
+                table.add_row(display::trades::_table_row(TradePresenter {
+                    trade: trade,
+                    fiat_pair: None,
+                }));
+            }
+        }
     }
 
     format!("{}", table)

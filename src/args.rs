@@ -89,10 +89,12 @@ where
     // let positions: Vec<Vec<TradePresenter>> = commands::positions::fetch(client)?;
     let positions = commands::positions::fetch(client)?;
 
+    let show_trades = matches.is_present("show-trades");
+
     Ok(match parse_format(matches) {
-        DisplayFormat::Table => display::positions::table(positions),
+        DisplayFormat::Table => display::positions::table(positions, show_trades),
         DisplayFormat::Ticker => display::positions::ticker(positions),
-        DisplayFormat::Default => display::positions::table(positions),
+        DisplayFormat::Default => display::positions::table(positions, show_trades),
     })
 }
 
