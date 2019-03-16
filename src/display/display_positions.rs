@@ -1,6 +1,6 @@
 use super::*;
 use crate::display;
-use cryptotrader::models::AssetType;
+use cryptotrader::models::*;
 use cryptotrader::presenters::*;
 use prettytable::{cell, row, Row, Table};
 
@@ -29,12 +29,12 @@ pub fn ticker(presenters: Vec<PositionPresenter>) -> String {
 
 pub fn table_row(presenter: &PositionPresenter) -> Row {
     row!(
-        presenter.symbol().yellow(),     // symbol
-        display_size(presenter.clone()), // size
+        presenter.symbol().yellow(), // symbol
         display_number_by_asset_type(
             presenter.position.entry_price(), // entry price
             presenter.position.asset.asset_type()
         ),
+        display_size(presenter.clone()), // size
         presenter // exit price
             .position
             .exit_price()
@@ -62,8 +62,8 @@ pub fn table(presenters: Vec<PositionPresenter>, show_trades: bool) -> String {
     table.set_format(table_format());
     table.set_titles(row!(
         "SYMBOL",
-        "SIZE",
         "ENTRY_PRICE",
+        "SIZE",
         "EXIT_PRICE",
         "UPNL",
         "RPNL",
@@ -73,7 +73,7 @@ pub fn table(presenters: Vec<PositionPresenter>, show_trades: bool) -> String {
     for presenter in presenters {
         table.add_row(table_row(&presenter));
         if show_trades {
-            for trade in presenter.position.trades {
+            for trade in group_and_average_trades_by_trade_type(presenter.position.trades) {
                 table.add_row(display::trades::_table_row(TradePresenter {
                     trade: trade,
                     fiat_pair: None,

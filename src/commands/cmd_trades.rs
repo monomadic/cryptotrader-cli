@@ -16,7 +16,7 @@ where
 {
     let pairs = client.all_pairs()?;
     let fiat_pair = client.btc_pair(pairs.clone());
-    let pairs = find_all_pairs_by_symbol(&symbol, pairs.clone());
+    let pairs = Pair::base_pairs_for_symbol(&symbol, &pairs);
     let mut presenters: Vec<TradePresenter> = Vec::new();
 
     info!(

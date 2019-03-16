@@ -11,8 +11,8 @@ pub fn _table_row(presenter: TradePresenter) -> Row {
     let trade = presenter.trade.clone();
     row!(
         format!("+ {}", display_pair(&trade.pair).yellow()),
+        display::pairs::pretty_price_from_base(&trade.pair.base, trade.price),
         size(presenter.clone()),
-        display::pairs::pretty_price_from_base(&trade.pair.base, trade.price)
     )
 }
 

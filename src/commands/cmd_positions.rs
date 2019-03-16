@@ -32,7 +32,7 @@ use log::info;
 
 //                 // take the most recent (open) trade
 //                 if let Some(trade) = trades.last().map(|t| t.clone()) {
-//                     // let symbol_pairs = find_all_pairs_by_symbol(&asset.symbol, pairs.clone());
+//                     // let symbol_pairs = Pair::base_pairs_for_symbol(&asset.symbol, &pairs);
 
 //                     result_buffer.push(vec![TradePresenter { trade, fiat_pair }]);
 //                 }
@@ -75,7 +75,7 @@ where
             if asset.amount >= 1.0 {
                 let trades = client.trades_for_pair(btc_pair_for_asset)?;
                 let position = Position::new(trades, asset.clone());
-                let pairs = find_all_pairs_by_symbol(&asset.symbol, pairs.clone());
+                let pairs = Pair::base_pairs_for_symbol(&asset.symbol, &pairs);
 
                 if let Ok(position) = position {
                     result_buffer.push(PositionPresenter {
@@ -87,6 +87,8 @@ where
             }
         }
     }
+
+    result_buffer.sort_by(|a, b| a.time().cmp(&b.time()));
 
     info!("position presenters: {:#?}", result_buffer);
     Ok(result_buffer)

@@ -42,6 +42,10 @@ subcommands:
                 help: Shows the trades encompassed in each position (only shown in table format)
                 short: s
                 takes_value: false
+            - pairs:
+                takes_value: true
+                multiple: true
+                required: false
     - trades:
         about: Shows all trades for a specific symbol across all pairs
         args:
