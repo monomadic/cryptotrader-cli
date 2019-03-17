@@ -9,10 +9,17 @@ use prettytable::{cell, row, Row};
 
 pub fn _table_row(presenter: TradePresenter) -> Row {
     let trade = presenter.trade.clone();
+    let indicator = match trade.trade_type {
+        TradeType::Buy => "+".green(),
+        TradeType::Sell => "-".red(),
+    };
+
     row!(
-        format!("+ {}", display_pair(&trade.pair).yellow()),
+        format!("{} {}", indicator, display_pair(&trade.pair).yellow()),
         display::pairs::pretty_price_from_base(&trade.pair.base, trade.price),
         size(presenter.clone()),
+        display::pairs::pretty_price_from_base(&trade.pair.base, trade.price),
+        format!("{:.2}", presenter.trade.qty),
     )
 }
 

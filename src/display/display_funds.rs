@@ -31,17 +31,16 @@ fn display_opening_balance(
     opening_balance: Option<f64>,
 ) -> ColoredString {
     opening_balance
-        .map(|opening_balance| {
-            // let btc_price = find_first_btc_usd_pair(&presenter.pairs.clone())
-            //     .map(|p| p.price)
-            //     .unwrap_or(0.0);
-            let current_balance = presenter.total_value_in_btc();
-            let profit_as_percent = price_percent(opening_balance, current_balance);
-            let profit_btc = current_balance - opening_balance;
-            let profit_usd = profit_btc
-                * Pair::find_first_btc_usd_pair(&presenter.pairs)
-                    .map(|p| p.price)
-                    .unwrap_or(0.0);
+        .map(|opening_balance_btc| {
+            // let current_balance_btc = presenter.total_value_in_btc();
+            let current_balance_usd = presenter.total_value_in_usd();
+            let btc_price = Pair::find_first_btc_usd_pair(&presenter.pairs)
+                .map(|p| p.price)
+                .unwrap_or(0.0);
+            let opening_balance_usd = opening_balance_btc * btc_price;
+            let profit_as_percent = price_percent(opening_balance_usd, current_balance_usd);
+            // let profit_btc = current_balance_btc - opening_balance_btc;
+            let profit_usd = current_balance_usd - opening_balance_usd;
 
             positive_negative(
                 profit_as_percent,

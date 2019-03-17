@@ -19,3 +19,14 @@ where
 
     Ok(display::pairs::table(pairs, client.base_pairs()))
 }
+
+pub fn parse_pairs<E>(client: &E, pairs: Vec<String>) -> Vec<Pair>
+where
+    E: ExchangeAPI,
+{
+    pairs
+        .into_iter()
+        .map(|pair| client.string_to_pair(pair.to_string(), 0.0))
+        .filter_map(|e| e)
+        .collect()
+}

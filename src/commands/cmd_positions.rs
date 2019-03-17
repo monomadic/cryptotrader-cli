@@ -44,7 +44,7 @@ use log::info;
 //     Ok(result_buffer)
 // }
 
-pub fn fetch<E>(client: E) -> CliResult<Vec<PositionPresenter>>
+pub fn fetch<E>(client: E, pairs: Option<Vec<Pair>>) -> CliResult<Vec<PositionPresenter>>
 where
     E: ExchangeAPI,
 {
@@ -60,7 +60,8 @@ where
             .join(", ")
     );
 
-    let pairs = client.all_pairs()?;
+    let pairs = pairs.unwrap_or(client.all_pairs()?);
+
     let btc_price_in_usd = client
         .btc_pair(pairs.clone())
         .map(|p| p.price)
@@ -68,12 +69,9 @@ where
 
     let mut result_buffer = Vec::new();
     for asset in assets {
-        let btc_pair_for_asset =
-            find_pair_by_symbol_and_base(&asset.symbol, &client.btc_symbol(), pairs.clone());
-
-        if let Some(btc_pair_for_asset) = btc_pair_for_asset {
+        if asset.asset_type() == AssetType::Altcoin {
             if asset.amount >= 1.0 {
-                let trades = client.trades_for_pair(btc_pair_for_asset)?;
+                let trades = client.trades_for_symbol(&asset.symbol, pairs.clone())?;
                 let position = Position::new(trades, asset.clone());
                 let pairs = Pair::base_pairs_for_symbol(&asset.symbol, &pairs);
 
@@ -88,8 +86,13 @@ where
         }
     }
 
-    result_buffer.sort_by(|a, b| a.time().cmp(&b.time()));
+    // result_buffer.sort_by(|a, b| a.time().cmp(&b.time()));
+    result_buffer.sort_by(|a, b| {
+        b.unrealised_profit_usd()
+            .partial_cmp(&a.unrealised_profit_usd())
+            .unwrap_or(std::cmp::Ordering::Less)
+    });
 
-    info!("position presenters: {:#?}", result_buffer);
+    info!("position presenters: {:?}", result_buffer);
     Ok(result_buffer)
 }

@@ -5,6 +5,7 @@
 
 use clap;
 use clap::{load_yaml, AppSettings, ArgMatches};
+use cryptotrader::models::Pair;
 use cryptotrader::{exchanges::binance::BinanceAPI, exchanges::ExchangeAPI};
 
 use crate::commands;
@@ -86,9 +87,14 @@ fn parse_positions<E>(matches: &ArgMatches, client: E) -> CliResult<String>
 where
     E: ExchangeAPI,
 {
-    // let positions: Vec<Vec<TradePresenter>> = commands::positions::fetch(client)?;
-    let positions = commands::positions::fetch(client)?;
+    let pairs: Option<Vec<Pair>> = matches.values_of("pairs").map(|p| {
+        commands::pairs::parse_pairs(
+            &client,
+            p.into_iter().map(|pair| pair.to_string()).collect(),
+        )
+    });
 
+    let positions = commands::positions::fetch(client, pairs)?;
     let show_trades = matches.is_present("show-trades");
 
     Ok(match parse_format(matches) {
