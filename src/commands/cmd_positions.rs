@@ -29,13 +29,16 @@ where
     let mut result_buffer = Vec::new();
     for asset in assets {
         if asset.asset_type() == AssetType::Altcoin {
-            if asset.amount >= 1.0 {
+            let pairs = Pair::base_pairs_for_symbol(&asset.symbol, &pairs);
+            let price_in_fiat = Pair::price_in_fiat(&asset.symbol, &pairs).unwrap_or(
+                Pair::price_in_btc(&asset.symbol, &pairs).unwrap_or(0.0) * btc_price_in_usd,
+            );
+
+            if price_in_fiat * asset.amount >= 100.0 {
                 let trades = client.trades_for_symbol(&asset.symbol, pairs.clone())?;
                 let trade_pairs = Trade::group_by_trade_pair(trades);
 
                 if let Some(most_recent_trade_pair) = trade_pairs.last() {
-                    let pairs = Pair::base_pairs_for_symbol(&asset.symbol, &pairs);
-
                     if let Ok(position) = Position::new(most_recent_trade_pair.to_vec(), asset) {
                         result_buffer.push(PositionPresenter {
                             position,
