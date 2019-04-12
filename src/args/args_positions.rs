@@ -17,7 +17,7 @@ where
 
     Ok(match parse_format(matches) {
         DisplayFormat::Table => display::positions::table(positions, show_trades),
-        DisplayFormat::Ticker => display::positions::ticker(positions),
-        DisplayFormat::Default => display::positions::table(positions, show_trades),
+        // DisplayFormat::Ticker => tickers::positions(&client, positions)?,
+        _ => display::positions::table(positions, show_trades),
     })
 }

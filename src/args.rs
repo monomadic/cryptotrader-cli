@@ -1,9 +1,8 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
 
-use crate::commands;
-use crate::display;
 use crate::error::*;
+use crate::{commands, display};
 use clap;
 use clap::{load_yaml, AppSettings, ArgMatches};
 use cryptotrader::models::Pair;
@@ -34,7 +33,7 @@ pub fn parse() -> CliResult<String> {
 
     // args have successfully parsed so we can start loading config etc.
     let conf = cryptotrader::config::read()?;
-    let keys = &conf.exchange["binance"];
+    let keys = &conf.exchange["huobi"];
     let client = BinanceAPI::connect(&keys.api_key, &keys.secret_key);
 
     match matches.subcommand() {
