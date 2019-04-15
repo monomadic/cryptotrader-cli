@@ -29,13 +29,12 @@ pub fn table_row(order: &Order) -> Row {
         format!("{}", order.pair).yellow(),
         format!("{}", order.order_type),
         display::trade_type::colored(order.trade_type),
-        format!("{:.2}", order.qty * order.price),
+//        format!("{:.2}", order.qty * order.price),
         order.qty,
-        format!(
-            "{:.8} ({:.2}%)",
-            order.price,
-            order.price_difference_as_percent()
-        ),
+//        format!(
+//            "({:.2}%)",
+//            order.price_difference_as_percent()
+//        ),
         order.time.format("%Y-%m-%d %H:%M").to_string(),
     )
 }

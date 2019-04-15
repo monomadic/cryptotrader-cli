@@ -7,17 +7,9 @@ pub fn fetch<E>(client: E, symbols: Vec<&str>) -> CliResult<String>
 where
     E: ExchangeAPI,
 {
-    let pairs = client.all_pairs()?;
-    let pairs = sort_pairs(pairs);
-
-    // filter symbols
-    let pairs = if symbols.len() > 0 {
-        filter_pairmap_by_symbols(pairs, symbols)
-    } else {
-        pairs
-    };
-
-    Ok(display::pairs::table(pairs, client.base_pairs()))
+    let prices = client.all_prices()?;
+//    let prices = sort_prices(prices);
+    Ok(display::pairs::table(prices, client.base_pairs()))
 }
 
 pub fn parse_pairs<E>(client: &E, pairs: Vec<String>) -> Vec<Pair>
@@ -37,8 +29,8 @@ pub fn parse_pair(pair: String) -> CliResult<Pair> {
         return Err(Box::new(arg_error))
     };
 
-    let pairs = pair.split_terminator(split_char);
-    let symbol = pairs.next().ok_or(arg_error)?.to_string();
+    let mut pairs = pair.split_terminator(split_char);
+    let symbol = pairs.next().ok_or(arg_error.clone())?.to_string();
     let base = pairs.next().ok_or(arg_error)?.to_string();
 
     Ok(Pair { symbol, base })

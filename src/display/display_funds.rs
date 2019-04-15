@@ -14,7 +14,7 @@ pub fn ticker(presenter: BalancePresenter, opening_balance: Option<f64>) -> Stri
             presenter.total_value_in_btc()
         ),
         display_opening_balance(&presenter, opening_balance),
-        Pair::find_first_btc_usd_pair(&presenter.pairs)
+        Price::find_first_btc_usd_price(&presenter.prices)
             .map(|btc_pair| format!(" :: {} ${}", "BTC PRICE".cyan(), btc_pair.price))
             .unwrap_or("".to_string()),
         "ALTS ".cyan(),
@@ -34,7 +34,7 @@ fn display_opening_balance(
         .map(|opening_balance_btc| {
             // let current_balance_btc = presenter.total_value_in_btc();
             let current_balance_usd = presenter.total_value_in_usd();
-            let btc_price = Pair::find_first_btc_usd_pair(&presenter.pairs)
+            let btc_price = Price::find_first_btc_usd_price(&presenter.prices)
                 .map(|p| p.price)
                 .unwrap_or(0.0);
             let opening_balance_usd = opening_balance_btc * btc_price;

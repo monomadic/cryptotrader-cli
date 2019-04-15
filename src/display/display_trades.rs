@@ -1,7 +1,6 @@
 use super::*;
 use crate::display;
 use crate::display::display_pairs::display_pair;
-// use colored::*;
 use cryptotrader;
 use cryptotrader::models::*;
 use cryptotrader::presenters::TradePresenter;
@@ -16,9 +15,9 @@ pub fn _table_row(presenter: TradePresenter) -> Row {
 
     row!(
         format!("{} {}", indicator, display_pair(&trade.pair).yellow()),
-        display::pairs::pretty_price_from_base(&trade.pair.base, trade.price),
+        display::pairs::pretty_price_from_base(&trade.pair.base, trade.sale_price),
         size(presenter.clone()),
-        display::pairs::pretty_price_from_base(&trade.pair.base, trade.price),
+        display::pairs::pretty_price_from_base(&trade.pair.base, trade.sale_price),
         format!("{:.2}", presenter.trade.qty),
     )
 }
@@ -48,7 +47,7 @@ fn ticker_entry(presenter: TradePresenter) -> String {
         .yellow(),
         size = size(presenter.clone()),
         profit = positive_negative(
-            presenter.trade.profit_as_percent(),
+            presenter.profit_as_percent(),
             display_profit(presenter)
         ),
     )
@@ -92,7 +91,7 @@ fn table_row(presenter: TradePresenter) -> String {
         "{symbol:normal_width$}{trade_type:<small_width$}{entry_price:normal_width$}{size:<normal_width$}{qty: <normal_width$}{fee:normal_width$}{current_price:<normal_width$}{profit:wide_width$}{time:<normal_width$}",
         symbol = format!("{}-{}", trade.pair.symbol, trade.pair.base).yellow(),
         trade_type = display::trade_type::colored(trade.trade_type),
-        entry_price = display::pairs::pretty_price_from_base(&trade.pair.base, trade.price),
+        entry_price = display::pairs::pretty_price_from_base(&trade.pair.base, trade.sale_price),
         size = size(presenter.clone()),
         qty = display_qty(trade.qty),
         fee = format!(
@@ -100,8 +99,8 @@ fn table_row(presenter: TradePresenter) -> String {
             &trade.fee,
             &trade.clone().fee_symbol.unwrap_or("".to_string())
         ),
-        current_price = display::pairs::pretty_price_from_base(&trade.pair.base, trade.pair.price),
-        profit = positive_negative(presenter.trade.profit_as_percent(), display_profit(presenter)),
+        current_price = display::pairs::pretty_price_from_base(&trade.pair.base, trade.sale_price),
+        profit = positive_negative(presenter.profit_as_percent(), display_profit(presenter)),
         time = trade.time.format("%Y-%m-%d %H:%M").to_string(),
         small_width = SMALL_COLUMN_WIDTH,
         normal_width = NORMAL_COLUMN_WIDTH,
@@ -110,11 +109,12 @@ fn table_row(presenter: TradePresenter) -> String {
 }
 
 fn display_profit(presenter: TradePresenter) -> String {
-    let current_profit_as_percent: f64 = presenter.trade.current_profit_as_percent();
-    let current_profit_in_fiat: String = match presenter.current_profit_in_fiat() {
-        Some(profit) => format!(" ({})", print_fiat(profit)),
-        None => "".to_string(),
-    };
+    let current_profit_as_percent: f64 = presenter.profit_as_percent();
+//    let current_profit_in_fiat: String = match presenter.current_profit_in_fiat() {
+//        Some(profit) => format!(" ({})", print_fiat(profit)),
+//        None => "".to_string(),
+//    };
+    let current_profit_in_fiat: String = "".to_string();
 
     format!(
         "{}{}",
@@ -125,11 +125,11 @@ fn display_profit(presenter: TradePresenter) -> String {
 
 fn size(presenter: TradePresenter) -> String {
     match presenter.trade.pair.base_type() {
-        AssetType::Fiat => format!("${:.2}", presenter.trade.value()),
+        AssetType::Stablecoin => format!("${:.2}", presenter.trade.sale_cost()),
         AssetType::Bitcoin | AssetType::Altcoin => format!(
             "{:.2} (${:.0})",
-            presenter.trade.value(),
-            presenter.current_cost_in_fiat().unwrap_or(0.0),
+            presenter.trade.sale_cost(),
+            presenter.current_cost_in_fiat(),
         ),
     }
 }

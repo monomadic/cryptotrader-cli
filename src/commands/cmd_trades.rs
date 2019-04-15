@@ -15,7 +15,7 @@ where
     E: ExchangeAPI,
 {
     let pairs = client.all_pairs()?;
-    let fiat_pair = client.btc_pair(pairs.clone());
+    let fiat_pair = client.btc_usd_pair();
     let pairs = Pair::base_pairs_for_symbol(&symbol, &pairs);
     let mut presenters: Vec<TradePresenter> = Vec::new();
 

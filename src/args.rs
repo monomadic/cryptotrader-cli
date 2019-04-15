@@ -5,7 +5,7 @@ use crate::error::*;
 use crate::{commands, display};
 use clap;
 use clap::{load_yaml, AppSettings, ArgMatches};
-use cryptotrader::models::Pair;
+//use cryptotrader::models::Pair;
 use cryptotrader::{exchanges::binance::BinanceAPI, exchanges::ExchangeAPI};
 
 mod args_format;
@@ -32,7 +32,8 @@ pub fn parse() -> CliResult<String> {
 
     // args have successfully parsed so we can start loading config etc.
     let conf = cryptotrader::config::read()?;
-    let keys = &conf.exchange["huobi"];
+//    let keys = &conf.exchange["huobi"];
+    let keys = &conf.exchange["binance"];
     let client = BinanceAPI::new(&keys.api_key, &keys.secret_key);
 
     match matches.subcommand() {
@@ -41,5 +42,6 @@ pub fn parse() -> CliResult<String> {
         ("trades", Some(m)) => args_trades::parse_trades(m, client),
         ("orders", Some(m)) => args_orders::parse_orders(m, client),
         ("funds", Some(m)) => args_funds::parse_funds(m, client),
+        _ => Ok("no cmd".to_string()),
     }
 }

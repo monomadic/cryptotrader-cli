@@ -7,8 +7,8 @@ pub fn fetch<E>(client: E) -> CliResult<BalancePresenter>
 where
     E: ExchangeAPI,
 {
-    let pairs = client.all_pairs()?;
+    let prices = client.all_prices()?;
     let assets = client.balances()?;
 
-    Ok(BalancePresenter { assets, pairs })
+    Ok(BalancePresenter { assets, prices })
 }

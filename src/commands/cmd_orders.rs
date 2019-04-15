@@ -7,7 +7,7 @@ where
     E: ExchangeAPI,
 {
     let pairs = client.all_pairs()?;
-    let orders = client.open_orders(pairs)?;
+    let orders = client.open_orders()?;
 
     Ok(orders)
 }
