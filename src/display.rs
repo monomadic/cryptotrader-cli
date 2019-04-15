@@ -2,8 +2,8 @@ use colored::*;
 
 pub mod display_pairs;
 pub use self::display_pairs as pairs;
-pub mod display_positions;
-pub use self::display_positions as positions;
+//pub mod display_positions;
+//pub use self::display_positions as positions;
 pub mod display_assets;
 pub use self::display_assets as assets;
 pub mod display_trades;

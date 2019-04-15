@@ -2,16 +2,12 @@ mod args;
 mod commands {
     pub mod cmd_pairs;
     pub use self::cmd_pairs as pairs;
-    pub mod cmd_positions;
-    pub use self::cmd_positions as positions;
     pub mod cmd_trades;
     pub use self::cmd_trades as trades;
     pub mod cmd_funds;
     pub use self::cmd_funds as funds;
     pub mod cmd_orders;
     pub use self::cmd_orders as orders;
-    pub mod cmd_scan;
-    pub use self::cmd_scan as scan;
 }
 mod display;
 mod error;
