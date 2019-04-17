@@ -9,7 +9,7 @@ where
 {
     let prices = client.all_prices()?;
 //    let prices = sort_prices(prices);
-    Ok(display::pairs::table(prices, client.base_pairs()))
+    Ok(display::pairs::table(prices))
 }
 
 pub fn parse_pairs<E>(client: &E, pairs: Vec<String>) -> Vec<Pair>

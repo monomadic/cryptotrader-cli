@@ -1,7 +1,7 @@
 use super::*;
 use cryptotrader;
 use cryptotrader::models::*;
-use prettytable::{cell, Row, Table};
+use prettytable::{row, cell, Row, Table};
 
 type PairMap = HashMap<String, Vec<Pair>>;
 use std::collections::HashMap;
@@ -46,12 +46,13 @@ fn price_row(symbol: &str, prices: Vec<Price>, base_pairs: &Vec<String>) -> Row 
     row
 }
 
-pub fn table(prices: Vec<Price>, base_pairs: Vec<String>) -> String {
+pub fn table(prices: Vec<Price>) -> String {
     let mut table = Table::new();
     table.set_format(table_format());
 
+//    let mut row = Row::new(Vec::new());
     for price in prices.clone() {
-        table.add_row(price_row(&price.pair.symbol, prices.clone(), &base_pairs));
+        table.add_row(row!(price.pair.to_string().yellow(), format_price(price)));
     }
 
     table.to_string()
