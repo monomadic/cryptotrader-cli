@@ -13,6 +13,7 @@ mod args_orders;
 mod args_pairs;
 mod args_trades;
 mod args_verbose;
+mod args_balance;
 
 pub enum DisplayFormat {
     Ticker,
@@ -44,6 +45,7 @@ pub fn parse() -> CliResult<String> {
         ("trades", Some(m)) => args_trades::parse_trades(m, client),
         ("orders", Some(m)) => args_orders::parse_orders(m, client),
         ("funds", Some(m)) => args_funds::parse_funds(m, client),
+        ("balance", Some(m)) => args_balance::parse(m, client),
         _ => Ok("no cmd".to_string()),
     }
 }

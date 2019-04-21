@@ -14,6 +14,8 @@ pub mod display_funds;
 pub use self::display_funds as funds;
 pub mod display_orders;
 pub use self::display_orders as orders;
+pub mod display_balance;
+pub use self::display_balance as balance;
 
 static SMALL_COLUMN_WIDTH: usize = 8;
 static NORMAL_COLUMN_WIDTH: usize = 16;

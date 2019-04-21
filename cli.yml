@@ -26,8 +26,10 @@ subcommands:
                 required: true
     - orders:
         about: Displays all open orders.
-    - funds:
+    - balance:
         about: Shows all assets held on the exchange.
+    - funds:
+        about: Shows a summary of total funds.
         args:
             - opening_balance:
                 long: opening_balance
