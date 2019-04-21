@@ -1,10 +1,8 @@
-use crate::{args::*, commands, display};
+use crate::{ args::*, commands, display, error::* };
+use cryptotrader::exchanges::ExchangeAPI;
 use clap;
 
-pub fn parse_orders<E>(matches: &clap::ArgMatches, client: E) -> CliResult<String>
-where
-    E: ExchangeAPI,
-{
-    let orders = commands::orders::fetch(client)?;
+pub fn parse_orders<E: ExchangeAPI + ?Sized>(matches: &clap::ArgMatches, client: Box<E>) -> CliResult<String> {
+    let orders = crate::commands::orders::fetch(client)?;
     Ok(display::orders::table(orders))
 }

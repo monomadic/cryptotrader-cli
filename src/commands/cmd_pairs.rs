@@ -3,7 +3,7 @@ use crate::error::*;
 use cryptotrader;
 use cryptotrader::{exchanges::*, models::*};
 
-pub fn fetch<E>(client: E, symbols: Vec<&str>) -> CliResult<String>
+pub fn fetch<E: ExchangeAPI + ?Sized>(client: Box<E>, symbols: Vec<&str>) -> CliResult<String>
 where
     E: ExchangeAPI,
 {

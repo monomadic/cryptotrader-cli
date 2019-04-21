@@ -2,19 +2,15 @@
 #![allow(unused_variables)]
 
 use crate::error::*;
-use crate::{commands, display};
 use clap;
 use clap::{load_yaml, AppSettings, ArgMatches};
-//use cryptotrader::models::Pair;
 use cryptotrader::{exchanges::binance::BinanceAPI, exchanges::ExchangeAPI};
-use cryptotrader::exchanges::Exchange::Huobi;
 use cryptotrader::exchanges::huobi::HuobiAPI;
 
 mod args_format;
 mod args_funds;
 mod args_orders;
 mod args_pairs;
-//mod args_positions;
 mod args_trades;
 mod args_verbose;
 
@@ -34,12 +30,13 @@ pub fn parse() -> CliResult<String> {
 
     // args have successfully parsed so we can start loading config etc.
     let conf = cryptotrader::config::read()?;
+    let keys = &conf.exchange[matches.value_of("exchange").unwrap_or("binance")];
 
-    let keys = &conf.exchange["huobi"];
-    let client = HuobiAPI::new(&keys.api_key, &keys.secret_key)?;
-
-//    let keys = &conf.exchange["binance"];
-//    let client = BinanceAPI::new(&keys.api_key, &keys.secret_key);
+    let client:Box<dyn ExchangeAPI> = match matches.value_of("exchange") {
+        Some("binance") => Box::new(BinanceAPI::new(&keys.api_key, &keys.secret_key)),
+        Some("huobi") => Box::new(HuobiAPI::new(&keys.api_key, &keys.secret_key)?),
+        _ => { return Err(Box::new(CliError::ArgumentError("no exchange argument found".to_string())))}
+    };
 
     match matches.subcommand() {
 //        ("positions", Some(m)) => args_positions::parse_positions(m, client),

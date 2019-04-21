@@ -32,12 +32,12 @@ fn table_format() -> TableFormat {
         .build()
 }
 
-fn print_bool(condition: bool) -> String {
-    match condition {
-        true => "".to_string(),
-        false => "*".red().to_string(),
-    }
-}
+//fn print_bool(condition: bool) -> String {
+//    match condition {
+//        true => "".to_string(),
+//        false => "*".red().to_string(),
+//    }
+//}
 
 // TODO: make private
 pub fn positive_negative(number: f64, string: String) -> ColoredString {
@@ -54,13 +54,13 @@ fn print_percent(num: f64) -> String {
     format!("{:.2}%", num)
 }
 
-fn print_fiat(num: f64) -> String {
-    if num < 10.0 {
-        format!("${:.3}", num)
-    } else {
-        format!("${:.0}", num)
-    }
-}
+//fn print_fiat(num: f64) -> String {
+//    if num < 10.0 {
+//        format!("${:.3}", num)
+//    } else {
+//        format!("${:.0}", num)
+//    }
+//}
 
 // fn print_btc(num: f64) -> String {
 //     if num < 1.0 {

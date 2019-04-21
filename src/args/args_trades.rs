@@ -1,11 +1,9 @@
 use crate::args::args_format::parse_format;
 use crate::args::*;
-use cryptotrader::{exchanges::ExchangeAPI};
+use crate::error::*;
+use cryptotrader::exchanges::ExchangeAPI;
 
-pub fn parse_trades<E>(matches: &clap::ArgMatches, client: E) -> CliResult<String>
-where
-    E: ExchangeAPI,
-{
+pub fn parse_trades<E:ExchangeAPI + ?Sized>(matches: &clap::ArgMatches, client: Box<E>) -> CliResult<String> {
     let limit = matches
         .value_of("limit")
         .and_then(|b| b.parse::<usize>().ok());

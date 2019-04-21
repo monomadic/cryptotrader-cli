@@ -3,6 +3,14 @@ version: "1.0"
 author: Rob Saunders <rob@wearebrandnew.com>
 about: Command line interface to the CryptoTrader library.
 args:
+    - exchange:
+        long: exchange
+        required: true
+        short: e
+        takes_value: true
+        multiple: false
+        help: Specify an exchange adaptor
+        possible_values: [ binance, huobi ]
     - verbose:
         long: verbose
         short: v
